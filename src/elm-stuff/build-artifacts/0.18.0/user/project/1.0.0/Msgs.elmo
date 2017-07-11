@@ -1,0 +1,6 @@
+var _user$project$Msgs$Mdl = function (a) {
+	return {ctor: 'Mdl', _0: a};
+};
+var _user$project$Msgs$SetDate = function (a) {
+	return {ctor: 'SetDate', _0: a};
+};

@@ -1,0 +1,410 @@
+var _user$project$View$fitsAfter = F3(
+	function (calendarEnd, a, b) {
+		return A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$SameOrAfter, b.start, a.end);
+	});
+var _user$project$View$sortCalendar = F3(
+	function (calendarEnd, acc, items) {
+		sortCalendar:
+		while (true) {
+			var _p0 = {ctor: '_Tuple2', _0: acc, _1: items};
+			if (_p0._1.ctor === '[]') {
+				return acc;
+			} else {
+				if (_p0._0.ctor === '[]') {
+					var _v1 = calendarEnd,
+						_v2 = {
+						ctor: '::',
+						_0: _p0._1._0,
+						_1: {ctor: '[]'}
+					},
+						_v3 = _p0._1._1;
+					calendarEnd = _v1;
+					acc = _v2;
+					items = _v3;
+					continue sortCalendar;
+				} else {
+					if (_p0._1._1.ctor === '[]') {
+						return A2(_elm_lang$core$Basics_ops['++'], items, acc);
+					} else {
+						var _p4 = _p0._0._1;
+						var _p3 = _p0._0._0;
+						var _p1 = A2(
+							_elm_lang$core$List$partition,
+							function (ci) {
+								return A3(_user$project$View$fitsAfter, calendarEnd, _p3, ci);
+							},
+							items);
+						var fits = _p1._0;
+						var nextItems = _p1._1;
+						var _p2 = {ctor: '_Tuple2', _0: fits, _1: nextItems};
+						_v4_2:
+						do {
+							if (_p2.ctor === '_Tuple2') {
+								if (_p2._0.ctor === '::') {
+									var _v5 = calendarEnd,
+										_v6 = {
+										ctor: '::',
+										_0: _p2._0._0,
+										_1: {ctor: '::', _0: _p3, _1: _p4}
+									},
+										_v7 = A2(_elm_lang$core$Basics_ops['++'], _p2._0._1, _p2._1);
+									calendarEnd = _v5;
+									acc = _v6;
+									items = _v7;
+									continue sortCalendar;
+								} else {
+									if (_p2._1.ctor === '::') {
+										var _v8 = calendarEnd,
+											_v9 = {
+											ctor: '::',
+											_0: _p2._1._0,
+											_1: {ctor: '::', _0: _p3, _1: _p4}
+										},
+											_v10 = _p2._1._1;
+										calendarEnd = _v8;
+										acc = _v9;
+										items = _v10;
+										continue sortCalendar;
+									} else {
+										break _v4_2;
+									}
+								}
+							} else {
+								break _v4_2;
+							}
+						} while(false);
+						return acc;
+					}
+				}
+			}
+		}
+	});
+var _user$project$View$itemStyling = {
+	ctor: '::',
+	_0: A2(_debois$elm_mdl$Material_Options$css, 'text-sizing', 'border-box'),
+	_1: {
+		ctor: '::',
+		_0: A2(_debois$elm_mdl$Material_Options$css, 'text-align', 'center'),
+		_1: {
+			ctor: '::',
+			_0: A2(_debois$elm_mdl$Material_Options$css, 'padding', '4px'),
+			_1: {
+				ctor: '::',
+				_0: A2(_debois$elm_mdl$Material_Options$css, 'border-right', '1px solid white'),
+				_1: {ctor: '[]'}
+			}
+		}
+	}
+};
+var _user$project$View$cellForCalendarItem = F2(
+	function (calendarStart, item) {
+		var offsetDays = A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, item.start, calendarStart);
+		return A2(
+			_debois$elm_mdl$Material_Grid$cell,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Color$background(_debois$elm_mdl$Material_Color$primary),
+					_1: {
+						ctor: '::',
+						_0: A2(_debois$elm_mdl$Material_Grid$size, _debois$elm_mdl$Material_Grid$All, item.duration),
+						_1: {
+							ctor: '::',
+							_0: A2(_debois$elm_mdl$Material_Grid$offset, _debois$elm_mdl$Material_Grid$All, offsetDays),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				_user$project$View$itemStyling),
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(item.text),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$View$gridForCalendarItems = F3(
+	function (calendarStart, calendarEnd, items) {
+		var _p5 = function () {
+			var _p6 = items;
+			if (_p6.ctor === '[]') {
+				return {
+					ctor: '_Tuple2',
+					_0: {ctor: '[]'},
+					_1: {ctor: '[]'}
+				};
+			} else {
+				if (_p6._1.ctor === '[]') {
+					return {
+						ctor: '_Tuple2',
+						_0: {
+							ctor: '::',
+							_0: _p6._0,
+							_1: {ctor: '[]'}
+						},
+						_1: {ctor: '[]'}
+					};
+				} else {
+					var _p7 = function () {
+						var _p8 = _elm_lang$core$List$tail(items);
+						if (_p8.ctor === 'Nothing') {
+							return {
+								ctor: '_Tuple2',
+								_0: {ctor: '[]'},
+								_1: {ctor: '[]'}
+							};
+						} else {
+							return function (_p9) {
+								var _p10 = _p9;
+								return {
+									ctor: '_Tuple2',
+									_0: A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, _p10._0),
+									_1: A2(_elm_lang$core$List$map, _elm_lang$core$Tuple$first, _p10._1)
+								};
+							}(
+								A2(
+									_user$project$Models$partitionWhile,
+									function (_p11) {
+										var _p12 = _p11;
+										return A3(_user$project$View$fitsAfter, calendarEnd, _p12._1, _p12._0);
+									},
+									A3(
+										_elm_lang$core$List$map2,
+										F2(
+											function (v0, v1) {
+												return {ctor: '_Tuple2', _0: v0, _1: v1};
+											}),
+										_p8._0,
+										items)));
+						}
+					}();
+					var li = _p7._0;
+					var remaining = _p7._1;
+					var head = A2(_elm_lang$core$List$take, 1, items);
+					return {
+						ctor: '_Tuple2',
+						_0: A2(_elm_lang$core$Basics_ops['++'], head, li),
+						_1: remaining
+					};
+				}
+			}
+		}();
+		var lineItems = _p5._0;
+		var remaining = _p5._1;
+		return {
+			ctor: '_Tuple2',
+			_0: A2(
+				_debois$elm_mdl$Material_Grid$grid,
+				{
+					ctor: '::',
+					_0: _debois$elm_mdl$Material_Grid$noSpacing,
+					_1: {ctor: '[]'}
+				},
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: A2(
+							_debois$elm_mdl$Material_Grid$cell,
+							{
+								ctor: '::',
+								_0: _debois$elm_mdl$Material_Color$background(_debois$elm_mdl$Material_Color$primaryDark),
+								_1: {
+									ctor: '::',
+									_0: A2(_debois$elm_mdl$Material_Grid$size, _debois$elm_mdl$Material_Grid$All, 4),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('foo'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					_elm_lang$core$List$reverse(
+						_elm_lang$core$Tuple$second(
+							A3(
+								_elm_lang$core$List$foldl,
+								F2(
+									function (ci, _p13) {
+										var _p14 = _p13;
+										return {
+											ctor: '_Tuple2',
+											_0: ci.end,
+											_1: {
+												ctor: '::',
+												_0: A2(_user$project$View$cellForCalendarItem, _p14._0, ci),
+												_1: _p14._1
+											}
+										};
+									}),
+								{
+									ctor: '_Tuple2',
+									_0: calendarStart,
+									_1: {ctor: '[]'}
+								},
+								lineItems))))),
+			_1: remaining
+		};
+	});
+var _user$project$View$gridForAllItems = F4(
+	function (calendarStart, calendarEnd, acc, items) {
+		gridForAllItems:
+		while (true) {
+			var _p15 = items;
+			if (_p15.ctor === '[]') {
+				return acc;
+			} else {
+				var _p16 = A3(_user$project$View$gridForCalendarItems, calendarStart, calendarEnd, items);
+				var grid = _p16._0;
+				var remaining = _p16._1;
+				var _v17 = calendarStart,
+					_v18 = calendarEnd,
+					_v19 = A2(
+					_elm_lang$core$Basics_ops['++'],
+					acc,
+					_elm_lang$core$List$singleton(grid)),
+					_v20 = remaining;
+				calendarStart = _v17;
+				calendarEnd = _v18;
+				acc = _v19;
+				items = _v20;
+				continue gridForAllItems;
+			}
+		}
+	});
+var _user$project$View$view = function (model) {
+	var dayHeaderCells = A2(
+		_elm_lang$core$List$map,
+		function (d) {
+			return A2(
+				_debois$elm_mdl$Material_Grid$cell,
+				{
+					ctor: '::',
+					_0: A2(_debois$elm_mdl$Material_Grid$size, _debois$elm_mdl$Material_Grid$All, 1),
+					_1: {
+						ctor: '::',
+						_0: _debois$elm_mdl$Material_Color$background(_debois$elm_mdl$Material_Color$primaryDark),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%a %e', d)),
+					_1: {ctor: '[]'}
+				});
+		},
+		A2(
+			_elm_lang$core$List$map,
+			function (i) {
+				return A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, i, model.calendarData.start);
+			},
+			A2(_elm_lang$core$List$range, 0, 6)));
+	var sortedCalendarItems = _elm_lang$core$List$reverse(
+		A3(
+			_user$project$View$sortCalendar,
+			model.calendarData.end,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$sortWith,
+				F2(
+					function (a, b) {
+						return A2(
+							_elm_lang$core$Basics$compare,
+							_elm_lang$core$Date$toTime(a.start),
+							_elm_lang$core$Date$toTime(b.start));
+					}),
+				model.calendarData.items)));
+	return A3(
+		_debois$elm_mdl$Material_Scheme$topWithScheme,
+		_debois$elm_mdl$Material_Color$LightGreen,
+		_debois$elm_mdl$Material_Color$Red,
+		A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: A2(
+						_debois$elm_mdl$Material_Grid$grid,
+						{
+							ctor: '::',
+							_0: _debois$elm_mdl$Material_Grid$noSpacing,
+							_1: {ctor: '[]'}
+						},
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: A2(
+									_debois$elm_mdl$Material_Grid$cell,
+									{
+										ctor: '::',
+										_0: A2(_debois$elm_mdl$Material_Grid$size, _debois$elm_mdl$Material_Grid$All, 1),
+										_1: {
+											ctor: '::',
+											_0: _debois$elm_mdl$Material_Color$background(_debois$elm_mdl$Material_Color$primaryDark),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('prev'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_debois$elm_mdl$Material_Grid$cell,
+										{
+											ctor: '::',
+											_0: A2(_debois$elm_mdl$Material_Grid$size, _debois$elm_mdl$Material_Grid$All, 3),
+											_1: {
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Color$background(_debois$elm_mdl$Material_Color$primaryDark),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(''),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							},
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								dayHeaderCells,
+								{
+									ctor: '::',
+									_0: A2(
+										_debois$elm_mdl$Material_Grid$cell,
+										{
+											ctor: '::',
+											_0: A2(_debois$elm_mdl$Material_Grid$size, _debois$elm_mdl$Material_Grid$All, 1),
+											_1: {
+												ctor: '::',
+												_0: _debois$elm_mdl$Material_Color$background(_debois$elm_mdl$Material_Color$primaryDark),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('next'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}))),
+					_1: {ctor: '[]'}
+				},
+				A4(
+					_user$project$View$gridForAllItems,
+					model.calendarData.start,
+					model.calendarData.end,
+					{ctor: '[]'},
+					sortedCalendarItems))));
+};

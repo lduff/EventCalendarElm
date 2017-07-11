@@ -1,0 +1,11 @@
+var _user$project$Main$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{ctor: '[]'});
+};
+var _user$project$Main$init = {
+	ctor: '_Tuple2',
+	_0: {currentDate: _elm_lang$core$Maybe$Nothing, calendarData: _user$project$Models$testData, mdl: _debois$elm_mdl$Material$model},
+	_1: A2(_elm_lang$core$Task$perform, _user$project$Msgs$SetDate, _elm_lang$core$Date$now)
+};
+var _user$project$Main$main = _elm_lang$html$Html$program(
+	{init: _user$project$Main$init, view: _user$project$View$view, update: _user$project$Update$update, subscriptions: _user$project$Main$subscriptions})();

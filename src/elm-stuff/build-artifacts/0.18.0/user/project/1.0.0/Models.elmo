@@ -1,0 +1,112 @@
+var _user$project$Models$partitionWhileInternal = F3(
+	function (predicate, acc, l) {
+		partitionWhileInternal:
+		while (true) {
+			var nextItem = _elm_lang$core$List$head(l);
+			var _p0 = nextItem;
+			if (_p0.ctor === 'Nothing') {
+				return {
+					ctor: '_Tuple2',
+					_0: acc,
+					_1: {ctor: '[]'}
+				};
+			} else {
+				var _p2 = _p0._0;
+				if (predicate(_p2)) {
+					var _p1 = _elm_lang$core$List$tail(l);
+					if (_p1.ctor === 'Nothing') {
+						return {
+							ctor: '_Tuple2',
+							_0: A2(_elm_lang$core$Basics_ops['++'], acc, l),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						var _v2 = predicate,
+							_v3 = A2(
+							_elm_lang$core$Basics_ops['++'],
+							acc,
+							_elm_lang$core$List$singleton(_p2)),
+							_v4 = _p1._0;
+						predicate = _v2;
+						acc = _v3;
+						l = _v4;
+						continue partitionWhileInternal;
+					}
+				} else {
+					return {ctor: '_Tuple2', _0: acc, _1: l};
+				}
+			}
+		}
+	});
+var _user$project$Models$partitionWhile = F2(
+	function (predicate, l) {
+		return A3(
+			_user$project$Models$partitionWhileInternal,
+			predicate,
+			{ctor: '[]'},
+			l);
+	});
+var _user$project$Models$calendarItem = F4(
+	function (itemText, itemCategory, itemStart, itemEnd) {
+		var _p3 = {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$Date$fromString(itemStart),
+			_1: _elm_lang$core$Date$fromString(itemEnd)
+		};
+		if (((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Ok')) && (_p3._1.ctor === 'Ok')) {
+			var _p5 = _p3._0._0;
+			var _p4 = _p3._1._0;
+			return _elm_lang$core$Result$Ok(
+				{
+					start: _p5,
+					end: _p4,
+					text: itemText,
+					category: itemCategory,
+					duration: A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, _p4, _p5)
+				});
+		} else {
+			return _elm_lang$core$Result$Err(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'date parse problem ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						itemStart,
+						A2(_elm_lang$core$Basics_ops['++'], ' ', itemEnd))));
+		}
+	});
+var _user$project$Models$testData = function () {
+	var calendarItems = A2(
+		_elm_lang$core$List$filterMap,
+		_elm_lang$core$Result$toMaybe,
+		{
+			ctor: '::',
+			_0: A4(_user$project$Models$calendarItem, 'test item3', 'meh.com', '7/14/2017', '7/15/2017'),
+			_1: {
+				ctor: '::',
+				_0: A4(_user$project$Models$calendarItem, 'test item1', 'meh.com', '7/9/2017', '7/10/2017'),
+				_1: {
+					ctor: '::',
+					_0: A4(_user$project$Models$calendarItem, 'test item2', 'morningsave.com', '7/12/2017', '7/15/2017'),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+	return {
+		items: calendarItems,
+		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/9/2017'),
+		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/15/2017')
+	};
+}();
+var _user$project$Models$Model = F3(
+	function (a, b, c) {
+		return {currentDate: a, calendarData: b, mdl: c};
+	});
+var _user$project$Models$CalendarItem = F5(
+	function (a, b, c, d, e) {
+		return {start: a, end: b, text: c, category: d, duration: e};
+	});
+var _user$project$Models$CalendarData = F3(
+	function (a, b, c) {
+		return {items: a, start: b, end: c};
+	});
