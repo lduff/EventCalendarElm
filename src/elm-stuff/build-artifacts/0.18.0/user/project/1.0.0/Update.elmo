@@ -1,17 +1,47 @@
 var _user$project$Update$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
-		if (_p0.ctor === 'SetDate') {
-			return {
-				ctor: '_Tuple2',
-				_0: _elm_lang$core$Native_Utils.update(
-					model,
-					{
-						currentDate: _elm_lang$core$Maybe$Just(_p0._0)
-					}),
-				_1: _elm_lang$core$Platform_Cmd$none
-			};
-		} else {
-			return A3(_debois$elm_mdl$Material$update, _user$project$Msgs$Mdl, _p0._0, model);
+		switch (_p0.ctor) {
+			case 'SetDate':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							currentDate: _elm_lang$core$Maybe$Just(_p0._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Mdl':
+				return A3(_debois$elm_mdl$Material$update, _user$project$Msgs$Mdl, _p0._0, model);
+			case 'AdjustCalendar':
+				var _p1 = _p0._0;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							start: A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p1, model.start),
+							end: A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p1, model.end)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							categories: A2(
+								_elm_lang$core$List$map,
+								function (c) {
+									return _elm_lang$core$Native_Utils.eq(c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
+										c,
+										{selected: !c.selected}) : c;
+								},
+								model.categories)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});

@@ -1,3 +1,9 @@
+var _user$project$Msgs$ToggleCategory = function (a) {
+	return {ctor: 'ToggleCategory', _0: a};
+};
+var _user$project$Msgs$AdjustCalendar = function (a) {
+	return {ctor: 'AdjustCalendar', _0: a};
+};
 var _user$project$Msgs$Mdl = function (a) {
 	return {ctor: 'Mdl', _0: a};
 };

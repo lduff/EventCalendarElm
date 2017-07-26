@@ -7,3 +7,5 @@ import Material
 type Msg
     = SetDate Date
     | Mdl (Material.Msg Msg)
+    | AdjustCalendar Int
+    | ToggleCategory String

@@ -4,7 +4,14 @@ var _user$project$Main$subscriptions = function (model) {
 };
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
-	_0: {currentDate: _elm_lang$core$Maybe$Nothing, calendarData: _user$project$Models$testData, mdl: _debois$elm_mdl$Material$model},
+	_0: {
+		currentDate: _elm_lang$core$Maybe$Nothing,
+		categories: _user$project$Models$categories,
+		mdl: _debois$elm_mdl$Material$model,
+		items: _user$project$Models$testData,
+		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/9/2017'),
+		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/15/2017')
+	},
 	_1: A2(_elm_lang$core$Task$perform, _user$project$Msgs$SetDate, _elm_lang$core$Date$now)
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(

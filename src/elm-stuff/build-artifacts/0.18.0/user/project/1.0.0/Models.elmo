@@ -46,6 +46,38 @@ var _user$project$Models$partitionWhile = F2(
 			{ctor: '[]'},
 			l);
 	});
+var _user$project$Models$categories = A2(
+	_elm_lang$core$List$map,
+	function (c) {
+		return {
+			name: c.name,
+			selected: true,
+			logo: c.logo,
+			hue: c.hue,
+			leftColor: A2(_debois$elm_mdl$Material_Color$color, c.hue, _debois$elm_mdl$Material_Color$S500),
+			leftColorHex: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, _debois$elm_mdl$Material_Color$S500),
+			leftColorDark: A2(_debois$elm_mdl$Material_Color$color, c.hue, _debois$elm_mdl$Material_Color$S900),
+			leftColorDarkHex: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, _debois$elm_mdl$Material_Color$S700),
+			itemColor: A2(_debois$elm_mdl$Material_Color$color, c.hue, _debois$elm_mdl$Material_Color$S300)
+		};
+	},
+	{
+		ctor: '::',
+		_0: {name: 'meh.com', logo: 'https://s3.amazonaws.com/mediocre-static/mehlogo.png', hue: _debois$elm_mdl$Material_Color$Green},
+		_1: {
+			ctor: '::',
+			_0: {name: 'morningsave.com', logo: 'https://s3.amazonaws.com/mediocre-static/morningsavelogo.png', hue: _debois$elm_mdl$Material_Color$Cyan},
+			_1: {
+				ctor: '::',
+				_0: {name: 'checkout.org', logo: 'https://s3.amazonaws.com/mediocre-static/checkoutlogo.png', hue: _debois$elm_mdl$Material_Color$BlueGrey},
+				_1: {
+					ctor: '::',
+					_0: {name: 'video', logo: 'https://s3.amazonaws.com/mediocre-static/videologo.png', hue: _debois$elm_mdl$Material_Color$Red},
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	});
 var _user$project$Models$calendarItem = F4(
 	function (itemText, itemCategory, itemStart, itemEnd) {
 		var _p3 = {
@@ -75,38 +107,79 @@ var _user$project$Models$calendarItem = F4(
 						A2(_elm_lang$core$Basics_ops['++'], ' ', itemEnd))));
 		}
 	});
-var _user$project$Models$testData = function () {
-	var calendarItems = A2(
-		_elm_lang$core$List$filterMap,
-		_elm_lang$core$Result$toMaybe,
-		{
+var _user$project$Models$testData = A2(
+	_elm_lang$core$List$filterMap,
+	_elm_lang$core$Result$toMaybe,
+	{
+		ctor: '::',
+		_0: A4(_user$project$Models$calendarItem, 'Meh Shirt', 'meh.com', '7/9/2017', '7/10/2017'),
+		_1: {
 			ctor: '::',
-			_0: A4(_user$project$Models$calendarItem, 'test item3', 'meh.com', '7/14/2017', '7/15/2017'),
+			_0: A4(_user$project$Models$calendarItem, 'Meh\'s 3rd Birthday', 'meh.com', '7/10/2017', '7/11/2017'),
 			_1: {
 				ctor: '::',
-				_0: A4(_user$project$Models$calendarItem, 'test item1', 'meh.com', '7/9/2017', '7/10/2017'),
+				_0: A4(_user$project$Models$calendarItem, 'Bormioli Momenti Wine Glasses (4 Pack Red/White)', 'meh.com', '7/11/2017', '7/12/2017'),
 				_1: {
 					ctor: '::',
-					_0: A4(_user$project$Models$calendarItem, 'test item2', 'morningsave.com', '7/12/2017', '7/15/2017'),
-					_1: {ctor: '[]'}
+					_0: A4(_user$project$Models$calendarItem, 'MiGear Extreme X Action Camera', 'meh.com', '7/12/2017', '7/13/2017'),
+					_1: {
+						ctor: '::',
+						_0: A4(_user$project$Models$calendarItem, 'Riviera Hoverboard', 'meh.com', '7/13/2017', '7/14/2017'),
+						_1: {
+							ctor: '::',
+							_0: A4(_user$project$Models$calendarItem, 'Quikut 20-Piece Knife Set', 'meh.com', '7/14/2017', '7/15/2017'),
+							_1: {
+								ctor: '::',
+								_0: A4(_user$project$Models$calendarItem, 'Shark Professional Series Steam Pocket Mop (Refurbished)', 'meh.com', '7/15/2017', '7/16/2017'),
+								_1: {
+									ctor: '::',
+									_0: A4(_user$project$Models$calendarItem, 'Jewelry by Pacific Pearls', 'morningsave.com', '7/9/2017', '7/13/2017'),
+									_1: {
+										ctor: '::',
+										_0: A4(_user$project$Models$calendarItem, 'THIS WEEK ON TV', 'checkout.org', '7/1/2017', '7/16/2017'),
+										_1: {
+											ctor: '::',
+											_0: A4(_user$project$Models$calendarItem, 'TMZ SPORTS DEALS', 'checkout.org', '7/9/2017', '7/30/2017'),
+											_1: {
+												ctor: '::',
+												_0: A4(_user$project$Models$calendarItem, 'Happy Birthday to Meh', 'video', '7/9/2017', '7/10/2017'),
+												_1: {
+													ctor: '::',
+													_0: A4(_user$project$Models$calendarItem, 'It\'s a Meh-rathon', 'video', '7/10/2017', '7/11/2017'),
+													_1: {
+														ctor: '::',
+														_0: A4(_user$project$Models$calendarItem, 'Garfield Hates Mondays: Maybe It Bothers Me More Than It Should', 'video', '7/11/2017', '7/13/2017'),
+														_1: {
+															ctor: '::',
+															_0: A4(_user$project$Models$calendarItem, 'Clocks: Mad Ape Den Karaoke', 'video', '7/13/2017', '7/15/2017'),
+															_1: {
+																ctor: '::',
+																_0: A4(_user$project$Models$calendarItem, 'Possum Head Chronicles, series 03 SUPERCUT', 'video', '7/15/2017', '7/16/2017'),
+																_1: {ctor: '[]'}
+															}
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 			}
-		});
-	return {
-		items: calendarItems,
-		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/9/2017'),
-		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/15/2017')
-	};
-}();
-var _user$project$Models$Model = F3(
-	function (a, b, c) {
-		return {currentDate: a, calendarData: b, mdl: c};
+		}
+	});
+var _user$project$Models$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {currentDate: a, categories: b, mdl: c, start: d, end: e, items: f};
 	});
 var _user$project$Models$CalendarItem = F5(
 	function (a, b, c, d, e) {
 		return {start: a, end: b, text: c, category: d, duration: e};
 	});
-var _user$project$Models$CalendarData = F3(
-	function (a, b, c) {
-		return {items: a, start: b, end: c};
+var _user$project$Models$Category = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {name: a, selected: b, logo: c, hue: d, leftColor: e, leftColorHex: f, leftColorDark: g, leftColorDarkHex: h, itemColor: i};
 	});
