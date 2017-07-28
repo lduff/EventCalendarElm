@@ -26,21 +26,58 @@ var _user$project$Update$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'ToggleCategory':
+				var updatedCategories = A2(
+					_elm_lang$core$List$map,
+					function (c) {
+						return _elm_lang$core$Native_Utils.eq(c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
+							c,
+							{selected: !c.selected}) : c;
+					},
+					model.categories);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							categories: A2(
-								_elm_lang$core$List$map,
-								function (c) {
-									return _elm_lang$core$Native_Utils.eq(c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
-										c,
-										{selected: !c.selected}) : c;
+						{categories: updatedCategories}),
+					_1: _user$project$Ports$storeFilteredCategories(
+						A2(
+							_elm_lang$core$List$map,
+							function (_) {
+								return _.name;
+							},
+							A2(
+								_elm_lang$core$List$filter,
+								function (_p2) {
+									return !function (_) {
+										return _.selected;
+									}(_p2);
 								},
-								model.categories)
-						}),
+								updatedCategories)))
+				};
+			case 'RetrieveFilteredCategories':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Ports$retrieveFilteredCategories(
+						{ctor: '_Tuple0'})
+				};
+			default:
+				var filteredCategories = A2(
+					_elm_lang$core$List$map,
+					function (c) {
+						return A2(_elm_lang$core$List$member, c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
+							c,
+							{selected: false}) : _elm_lang$core$Native_Utils.update(
+							c,
+							{selected: true});
+					},
+					model.categories);
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{categories: filteredCategories}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}

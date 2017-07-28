@@ -6,6 +6,7 @@ import Html exposing (..)
 import Material
 import Models exposing (Model)
 import Msgs exposing (Msg(..))
+import Ports exposing (..)
 import Task
 import Update exposing (update)
 import View exposing (view)
@@ -30,10 +31,13 @@ init =
       , start = unsafeFromString "7/9/2017"
       , end = unsafeFromString "7/15/2017"
       }
-    , Task.perform SetDate Date.now
+    , Cmd.batch
+        [ Task.perform SetDate Date.now
+        , retrieveFilteredCategories ()
+        ]
     )
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch []
+    Sub.batch [ filteredCategories Msgs.FilteredCategories ]

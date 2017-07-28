@@ -9,3 +9,5 @@ type Msg
     | Mdl (Material.Msg Msg)
     | AdjustCalendar Int
     | ToggleCategory String
+    | RetrieveFilteredCategories
+    | FilteredCategories (List String)

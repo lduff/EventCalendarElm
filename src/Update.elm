@@ -4,6 +4,7 @@ import Date.Extra.Duration exposing (..)
 import Material
 import Models exposing (Model)
 import Msgs exposing (Msg(..))
+import Ports exposing (..)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -24,8 +25,8 @@ update msg model =
             )
 
         ToggleCategory toggleCategory ->
-            ( { model
-                | categories =
+            let
+                updatedCategories =
                     model.categories
                         |> List.map
                             (\c ->
@@ -34,6 +35,28 @@ update msg model =
                                 else
                                     c
                             )
-              }
-            , Cmd.none
+            in
+            ( { model | categories = updatedCategories }
+            , storeFilteredCategories
+                (updatedCategories
+                    |> List.filter (not << .selected)
+                    |> List.map .name
+                )
             )
+
+        RetrieveFilteredCategories ->
+            ( model, retrieveFilteredCategories () )
+
+        FilteredCategories categories ->
+            let
+                filteredCategories =
+                    model.categories
+                        |> List.map
+                            (\c ->
+                                if List.member c.name categories then
+                                    { c | selected = False }
+                                else
+                                    { c | selected = True }
+                            )
+            in
+            ( { model | categories = filteredCategories }, Cmd.none )

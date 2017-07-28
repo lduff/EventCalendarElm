@@ -1,0 +1,16 @@
+var _user$project$Ports$retrieveFilteredCategories = _elm_lang$core$Native_Platform.outgoingPort(
+	'retrieveFilteredCategories',
+	function (v) {
+		return null;
+	});
+var _user$project$Ports$filteredCategories = _elm_lang$core$Native_Platform.incomingPort(
+	'filteredCategories',
+	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
+var _user$project$Ports$storeFilteredCategories = _elm_lang$core$Native_Platform.outgoingPort(
+	'storeFilteredCategories',
+	function (v) {
+		return _elm_lang$core$Native_List.toArray(v).map(
+			function (v) {
+				return v;
+			});
+	});
