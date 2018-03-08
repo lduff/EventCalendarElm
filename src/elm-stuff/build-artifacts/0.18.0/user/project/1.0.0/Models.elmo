@@ -54,25 +54,23 @@ var _user$project$Models$categories = A2(
 			selected: true,
 			logo: c.logo,
 			hue: c.hue,
-			leftColor: A2(_debois$elm_mdl$Material_Color$color, c.hue, _debois$elm_mdl$Material_Color$S500),
-			leftColorHex: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, _debois$elm_mdl$Material_Color$S500),
-			leftColorDark: A2(_debois$elm_mdl$Material_Color$color, c.hue, _debois$elm_mdl$Material_Color$S900),
-			leftColorDarkHex: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, _debois$elm_mdl$Material_Color$S700),
-			itemColor: A2(_debois$elm_mdl$Material_Color$color, c.hue, _debois$elm_mdl$Material_Color$S300)
+			leftColor: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, '500'),
+			leftColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, '900'),
+			itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, '300')
 		};
 	},
 	{
 		ctor: '::',
-		_0: {name: 'meh.com', logo: 'https://s3.amazonaws.com/mediocre-static/mehlogo.png', hue: _debois$elm_mdl$Material_Color$Green},
+		_0: {name: 'meh.com', logo: 'https://s3.amazonaws.com/mediocre-static/mehlogo.png', hue: 'green'},
 		_1: {
 			ctor: '::',
-			_0: {name: 'morningsave.com', logo: 'https://s3.amazonaws.com/mediocre-static/morningsavelogo.png', hue: _debois$elm_mdl$Material_Color$Cyan},
+			_0: {name: 'morningsave.com', logo: 'https://s3.amazonaws.com/mediocre-static/morningsavelogo.png', hue: 'cyan'},
 			_1: {
 				ctor: '::',
-				_0: {name: 'checkout.org', logo: 'https://s3.amazonaws.com/mediocre-static/checkoutlogo.png', hue: _debois$elm_mdl$Material_Color$BlueGrey},
+				_0: {name: 'checkout.org', logo: 'https://s3.amazonaws.com/mediocre-static/checkoutlogo.png', hue: 'blue-grey'},
 				_1: {
 					ctor: '::',
-					_0: {name: 'video', logo: 'https://s3.amazonaws.com/mediocre-static/videologo.png', hue: _debois$elm_mdl$Material_Color$Red},
+					_0: {name: 'video', logo: 'https://s3.amazonaws.com/mediocre-static/videologo.png', hue: 'red'},
 					_1: {ctor: '[]'}
 				}
 			}
@@ -171,15 +169,15 @@ var _user$project$Models$testData = A2(
 			}
 		}
 	});
-var _user$project$Models$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {currentDate: a, categories: b, mdl: c, start: d, end: e, items: f};
+var _user$project$Models$Model = F5(
+	function (a, b, c, d, e) {
+		return {currentDate: a, categories: b, start: c, end: d, items: e};
 	});
 var _user$project$Models$CalendarItem = F5(
 	function (a, b, c, d, e) {
 		return {start: a, end: b, text: c, category: d, duration: e};
 	});
-var _user$project$Models$Category = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {name: a, selected: b, logo: c, hue: d, leftColor: e, leftColorHex: f, leftColorDark: g, leftColorDarkHex: h, itemColor: i};
+var _user$project$Models$Category = F7(
+	function (a, b, c, d, e, f, g) {
+		return {name: a, selected: b, logo: c, hue: d, leftColor: e, leftColorDark: f, itemColor: g};
 	});

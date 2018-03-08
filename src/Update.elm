@@ -1,7 +1,6 @@
 module Update exposing (update)
 
 import Date.Extra.Duration exposing (..)
-import Material
 import Models exposing (Model)
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
@@ -12,9 +11,6 @@ update msg model =
     case msg of
         SetDate d ->
             ( { model | currentDate = Just d }, Cmd.none )
-
-        Mdl msg_ ->
-            Material.update Mdl msg_ model
 
         AdjustCalendar days ->
             ( { model

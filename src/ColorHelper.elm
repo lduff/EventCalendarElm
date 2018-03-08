@@ -1,14 +1,13 @@
 module ColorHelper exposing (hueAndShadeToHex)
 
 import Dict exposing (Dict, fromList, get)
-import Material.Color as Color exposing (..)
 
 
-hueAndShadeToHex : Hue -> Shade -> String
+hueAndShadeToHex : String -> String -> String
 hueAndShadeToHex h s =
     let
         colorString =
-            Color.hueName h ++ shadeName s
+            String.concat [ h, s ]
     in
     case Dict.get colorString colorTable of
         Just s ->
@@ -16,52 +15,6 @@ hueAndShadeToHex h s =
 
         Nothing ->
             "magenta"
-
-
-shadeName : Shade -> String
-shadeName shade =
-    case shade of
-        S50 ->
-            "50"
-
-        S100 ->
-            "100"
-
-        S200 ->
-            "200"
-
-        S300 ->
-            "300"
-
-        S400 ->
-            "400"
-
-        S500 ->
-            "500"
-
-        S600 ->
-            "600"
-
-        S700 ->
-            "700"
-
-        S800 ->
-            "800"
-
-        S900 ->
-            "900"
-
-        A100 ->
-            "A100"
-
-        A200 ->
-            "A200"
-
-        A400 ->
-            "A400"
-
-        A700 ->
-            "A700"
 
 
 colorTable : Dict String String

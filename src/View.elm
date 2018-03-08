@@ -8,103 +8,96 @@ import Date.Extra.Format exposing (format)
 import Dict exposing (Dict)
 import Dict.Extra
 import Html exposing (..)
-import Html.Attributes exposing (src)
+import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import List
-import Material.Button as Button
-import Material.Color as Color
-import Material.Grid exposing (Cell, Device(..), cell, grid, noSpacing, offset, order, size)
-import Material.Icon as Icon
-import Material.Layout as Layout
-import Material.Options as Options exposing (Style, css, styled)
-import Material.Scheme
-import Material.Textfield as Textfield
-import Material.Toggles as Toggles
-import Material.Typography as Typo
 import Models exposing (CalendarItem, Category, Model, calendarItem, partitionWhile)
 import Msgs exposing (Msg(..))
 import Tuple exposing (first, second)
 
 
-backgroundColor : Color.Color
-backgroundColor =
-    Color.color Color.Amber Color.S50
+stylesheet : Html msg
+stylesheet =
+    let
+        tag =
+            "link"
+
+        attrs =
+            [ attribute "rel" "stylesheet"
+            , attribute "property" "stylesheet"
+            , attribute "href" "//cdnjs.cloudflare.com/ajax/libs/bulma/0.6.2/css/bulma.css"
+            ]
+
+        children =
+            []
+    in
+    node tag attrs children
 
 
-backgroundColorHex : String
-backgroundColorHex =
-    "#FFF8E1"
+fontawesome : Html msg
+fontawesome =
+    node "script" [ defer True, src "//use.fontawesome.com/releases/v5.0.8/js/all.js" ] []
 
 
 view : Model -> Html Msg
 view model =
-    Layout.render Mdl
-        model.mdl
-        [ Layout.fixedHeader
+    section [ class "section" ]
+        [ div
+            [ id "outer"
+            , class "container"
+            ]
+            [ stylesheet
+            , fontawesome
+            , viewHeader model
+
+            --, viewDrawer model
+            , viewCalendar model
+            ]
         ]
-        { header = [ viewHeader model ]
-        , drawer = [ viewDrawer model ]
-        , tabs = ( [], [] )
-        , main = [ viewCalendar model ]
-        }
-        |> Material.Scheme.topWithScheme Color.BlueGrey Color.Red
+
+
+checkbox : String -> Bool -> Html Msg
+checkbox checkboxText checkboxSelected =
+    label [ class "checkbox" ]
+        [ input
+            [ type_ "checkbox"
+            , selected checkboxSelected
+            ]
+            [ text checkboxText ]
+        ]
 
 
 viewDrawer : Model -> Html Msg
 viewDrawer model =
-    Options.styled div
-        [ css "padding" "10px" ]
+    div
+        []
         (model.categories
             |> List.indexedMap
                 (\i c ->
-                    Toggles.checkbox Mdl
-                        [ 1, i ]
-                        model.mdl
-                        [ Options.onToggle <| ToggleCategory c.name
-                        , Toggles.ripple
-                        , Toggles.value c.selected
-                        ]
-                        [ text c.name ]
+                    checkbox c.name c.selected
                 )
         )
 
 
 viewHeader : Model -> Html Msg
 viewHeader model =
-    Options.styled div
-        [ css "display" "flex"
-        , css "align-items" "center"
-        , css "justify-content" "flex-start"
-        , css "font-family" "Roboto,Helvetica"
-        , css "padding-left" "80px"
-        , Typo.contrast 1.0
-        ]
-        [ Options.styled span [] [ text "EVENT CALENDAR" ]
-        , Options.styled div
-            [ css "display" "flex"
-            , css "align-items" "center"
-            , css "justify-content" "center"
-            , css "margin-left" "20px"
-            , css "margin-top" "8px"
-            , css "margin-bottom" "8px"
-            , css "padding-left" "4px"
-            , css "padding-right" "4px"
-            , css "border-radius" "4px"
-            , Color.background (Color.color Color.BlueGrey Color.S200)
-            ]
-            [ Button.render Mdl
-                [ 3 ]
-                model.mdl
-                [ Button.icon
-                , Button.ripple
+    nav [ class "level" ]
+        [ div [ class "level-left" ] [ text "EVENT CALENDAR" ]
+        , div [ class "level-right" ]
+            [ div [ class "field has-addons" ]
+                [ div [ class "control" ]
+                    [ input
+                        [ class "input"
+                        , type_ "text"
+                        , placeholder "Find calendar items"
+                        ]
+                        []
+                    ]
+                , div [ class "control" ]
+                    [ a [ class "button is-info" ]
+                        [ text "Search" ]
+                    ]
                 ]
-                [ Icon.i "search" ]
-            , Textfield.render Mdl
-                [ 2 ]
-                model.mdl
-                [ css "padding" "8px"
-                ]
-                []
-            , Options.styled span [ css "width" "10px" ] [ text "" ]
             ]
         ]
 
@@ -126,62 +119,35 @@ viewCalendar model =
                 |> Dict.Extra.groupBy .category
 
         prevNextStyling =
-            [ css "display" "flex"
-            , css "align-items" "center"
-            , css "align-content" "center"
-            , css "justify-content" "center"
-            , css "font-family" "Roboto,Helvetica"
-            , css "color" "white"
-            , Typo.subhead
-            , Typo.contrast 1.0
-            ]
+            []
 
         dayHeaderStyling =
-            [ css "text-sizing" "border-box"
-            , Typo.center
-            , css "padding" "4px"
-            , css "color" "white"
-            , Typo.subhead
-            , Typo.contrast 1.0
-            ]
+            []
 
         dayHeaderCells =
             List.range 0 6
                 |> List.map (\i -> Duration.add Duration.Day i model.start)
                 |> List.map
                     (\d ->
-                        cell ([ size All 1, Color.background Color.primaryDark, css "width" "12%" ] ++ dayHeaderStyling)
-                            [ text <| format config "%a %e" d ]
+                        div [ class "column has-text-centered" ] [ text <| format config "%a %e" d ]
                     )
     in
-    Options.styled div
-        [ Color.background backgroundColor ]
-        ([ grid [ noSpacing ]
-            [ cell ([ size All 12, Color.background Color.primaryDark ] ++ prevNextStyling)
-                [ Button.render Mdl
-                    [ 0, 0 ]
-                    model.mdl
-                    [ Button.minifab
-                    , Button.ripple
-                    , Options.onClick (AdjustCalendar -7)
-                    ]
-                    [ Icon.i "fast_rewind" ]
-                , text <| "Week of " ++ format config "%B %e, %Y" model.start
-                , Button.render Mdl
-                    [ 0, 1 ]
-                    model.mdl
-                    [ Button.minifab
-                    , Button.ripple
-                    , Options.onClick (AdjustCalendar 7)
-                    ]
-                    [ Icon.i "fast_forward" ]
+    div
+        []
+        ([ div [ class "columns" ]
+            [ div [ class "column is-2" ]
+                [ button [ class "button is-pulled-left", onClick (AdjustCalendar -7) ]
+                    [ i [ class "fas fast-backward" ] [] ]
+                ]
+            , div [ class "column is-8 has-text-centered" ]
+                [ text <| "Week of " ++ format config "%B %e, %Y" model.start ]
+            , div [ class "column is-2" ]
+                [ button [ class "button is-pulled-right", onClick (AdjustCalendar 7) ]
+                    [ i [ class "fas fast-forward" ] [] ]
                 ]
             ]
-         , grid [ noSpacing ]
-            ([ cell [ size All 5, Color.background Color.primaryDark, css "width" "16%" ] [ text "" ]
-             ]
-                ++ dayHeaderCells
-            )
+         , div [ class "columns" ]
+            ([ div [ class "column is-5" ] [ text "" ] ] ++ dayHeaderCells)
          ]
             ++ (model.categories
                     |> List.filter .selected
@@ -212,12 +178,8 @@ gridForAllItems category calendarStart calendarEnd acc items =
     case items of
         [] ->
             acc
-                ++ [ grid []
-                        [ cell
-                            [ Color.background backgroundColor
-                            , size All 12
-                            , css "height" "1px"
-                            ]
+                ++ [ div [ class "columns" ]
+                        [ div [ class "column is-12" ]
                             [ text "" ]
                         ]
                    ]
@@ -258,23 +220,13 @@ gridForNextItems category showHeader calendarStart calendarEnd items =
                     in
                     ( head ++ li, remaining )
     in
-    ( grid [ noSpacing ]
-        ([ cell
-            [ Color.background category.leftColor
-            , size All 5
-            , css "display" "flex"
-            , css "align-items" "center"
-            , css "justify-content" "center"
-            , css "width" "16%"
-            , css "border-right" <| "4px solid " ++ category.leftColorDarkHex
+    ( div [ class "columns" ]
+        ([ div
+            [ class "column is-5"
+            , style [ ( "backgroundColor", category.leftColor ) ]
             ]
             [ if showHeader then
-                Options.styled_ img
-                    [ css "height" "20px"
-                    , css "padding" "4px"
-                    ]
-                    [ src category.logo ]
-                    []
+                img [ src category.logo ] []
               else
                 text ""
             ]
@@ -293,45 +245,29 @@ gridForNextItems category showHeader calendarStart calendarEnd items =
     )
 
 
-cellForCalendarItem : Category -> Date -> Date -> CalendarItem -> Cell a
+cellForCalendarItem : Category -> Date -> Date -> CalendarItem -> Html a
 cellForCalendarItem category calendarStart calendarEnd item =
     let
         itemWidth =
-            min item.duration (1 + diffDays calendarEnd calendarStart)
-
-        itemStyling : List (Style a)
-        itemStyling =
-            [ css "display" "flex"
-            , css "align-items" "center"
-            , css "align-content" "center"
-            , css "justify-content" "center"
-            , css "text-sizing" "border-box"
-            , css "padding" "4px"
-            , css "font-family" "Roboto,Helvetica"
-            , css "border-left" <| "1px solid " ++ category.leftColorDarkHex
-            , css "border-bottom" <| "1px solid " ++ backgroundColorHex
-            , css "width" <| (toString <| 12 * toFloat itemWidth) ++ "%"
-            ]
+            Basics.min item.duration (1 + diffDays calendarEnd calendarStart)
 
         offsetDays =
-            max 0 (diffDays item.start calendarStart)
+            Basics.max 0 (diffDays item.start calendarStart)
     in
-    cell
-        ([ Color.background category.itemColor
-         , size All itemWidth
-         , css "margin-left" <| (toString <| 12 * toFloat offsetDays) ++ "%"
-
-         {- offset All offsetDays -}
-         ]
-            ++ itemStyling
-        )
+    div
+        [ class <| String.concat [ "column is-", toString itemWidth, " is-offset-", toString offsetDays ]
+        , style
+            [ ( "backgroundColor", category.itemColor )
+            , ( "font-family", "Helvetica" )
+            ]
+        ]
         [ if is Before item.start calendarStart then
-            Options.styled span [ Typo.caption ] [ text <| format config "« %B %e" item.start ]
+            span [] [ text <| format config "« %B %e" item.start ]
           else
             text ""
-        , Options.styled span [ css "width" "86%", css "text-align" "center" ] [ text item.text ]
+        , span [ class "has-text-centered" ] [ text item.text ]
         , if is After item.end (Duration.add Duration.Day 1 calendarEnd) then
-            Options.styled span [ Typo.caption ] [ text <| format config "%B %e »" item.end ]
+            span [] [ text <| format config "%B %e »" item.end ]
           else
             text ""
         ]

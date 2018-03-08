@@ -3,7 +3,6 @@ module Main exposing (main)
 import Date exposing (..)
 import Date.Extra.Utils exposing (unsafeFromString)
 import Html exposing (..)
-import Material
 import Models exposing (Model)
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
@@ -26,7 +25,6 @@ init : ( Model, Cmd Msg )
 init =
     ( { currentDate = Nothing
       , categories = Models.categories
-      , mdl = Material.model
       , items = Models.testData
       , start = unsafeFromString "7/9/2017"
       , end = unsafeFromString "7/15/2017"

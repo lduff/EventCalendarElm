@@ -3,14 +3,11 @@ module Models exposing (..)
 import ColorHelper exposing (hueAndShadeToHex)
 import Date exposing (Date)
 import Date.Extra.Duration exposing (diffDays)
-import Material
-import Material.Color as Color
 
 
 type alias Model =
     { currentDate : Maybe Date
     , categories : List Category
-    , mdl : Material.Model
     , start : Date
     , end : Date
     , items : List CalendarItem
@@ -30,12 +27,10 @@ type alias Category =
     { name : String
     , selected : Bool
     , logo : String
-    , hue : Color.Hue
-    , leftColor : Color.Color
-    , leftColorHex : String
-    , leftColorDark : Color.Color
-    , leftColorDarkHex : String
-    , itemColor : Color.Color
+    , hue : String
+    , leftColor : String
+    , leftColorDark : String
+    , itemColor : String
     }
 
 
@@ -59,19 +54,19 @@ categories : List Category
 categories =
     [ { name = "meh.com"
       , logo = "https://s3.amazonaws.com/mediocre-static/mehlogo.png"
-      , hue = Color.Green
+      , hue = "green"
       }
     , { name = "morningsave.com"
       , logo = "https://s3.amazonaws.com/mediocre-static/morningsavelogo.png"
-      , hue = Color.Cyan
+      , hue = "cyan"
       }
     , { name = "checkout.org"
       , logo = "https://s3.amazonaws.com/mediocre-static/checkoutlogo.png"
-      , hue = Color.BlueGrey
+      , hue = "blue-grey"
       }
     , { name = "video"
       , logo = "https://s3.amazonaws.com/mediocre-static/videologo.png"
-      , hue = Color.Red
+      , hue = "red"
       }
     ]
         |> List.map
@@ -80,11 +75,9 @@ categories =
                 , selected = True
                 , logo = c.logo
                 , hue = c.hue
-                , leftColor = Color.color c.hue Color.S500
-                , leftColorHex = hueAndShadeToHex c.hue Color.S500
-                , leftColorDark = Color.color c.hue Color.S900
-                , leftColorDarkHex = hueAndShadeToHex c.hue Color.S700
-                , itemColor = Color.color c.hue Color.S300
+                , leftColor = ColorHelper.hueAndShadeToHex c.hue "500"
+                , leftColorDark = ColorHelper.hueAndShadeToHex c.hue "900"
+                , itemColor = ColorHelper.hueAndShadeToHex c.hue "300"
                 }
             )
 

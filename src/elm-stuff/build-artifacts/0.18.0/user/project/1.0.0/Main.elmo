@@ -11,7 +11,6 @@ var _user$project$Main$init = {
 	_0: {
 		currentDate: _elm_lang$core$Maybe$Nothing,
 		categories: _user$project$Models$categories,
-		mdl: _debois$elm_mdl$Material$model,
 		items: _user$project$Models$testData,
 		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/9/2017'),
 		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/15/2017')

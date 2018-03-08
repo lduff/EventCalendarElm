@@ -12,8 +12,6 @@ var _user$project$Update$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'Mdl':
-				return A3(_debois$elm_mdl$Material$update, _user$project$Msgs$Mdl, _p0._0, model);
 			case 'AdjustCalendar':
 				var _p1 = _p0._0;
 				return {

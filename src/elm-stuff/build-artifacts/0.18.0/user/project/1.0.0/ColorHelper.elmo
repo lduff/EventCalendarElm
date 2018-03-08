@@ -1024,48 +1024,21 @@ var _user$project$ColorHelper$colorTable = _elm_lang$core$Dict$fromList(
 			}
 		}
 	});
-var _user$project$ColorHelper$shadeName = function (shade) {
-	var _p0 = shade;
-	switch (_p0.ctor) {
-		case 'S50':
-			return '50';
-		case 'S100':
-			return '100';
-		case 'S200':
-			return '200';
-		case 'S300':
-			return '300';
-		case 'S400':
-			return '400';
-		case 'S500':
-			return '500';
-		case 'S600':
-			return '600';
-		case 'S700':
-			return '700';
-		case 'S800':
-			return '800';
-		case 'S900':
-			return '900';
-		case 'A100':
-			return 'A100';
-		case 'A200':
-			return 'A200';
-		case 'A400':
-			return 'A400';
-		default:
-			return 'A700';
-	}
-};
 var _user$project$ColorHelper$hueAndShadeToHex = F2(
 	function (h, s) {
-		var colorString = A2(
-			_elm_lang$core$Basics_ops['++'],
-			_debois$elm_mdl$Material_Color$hueName(h),
-			_user$project$ColorHelper$shadeName(s));
-		var _p1 = A2(_elm_lang$core$Dict$get, colorString, _user$project$ColorHelper$colorTable);
-		if (_p1.ctor === 'Just') {
-			return _p1._0;
+		var colorString = _elm_lang$core$String$concat(
+			{
+				ctor: '::',
+				_0: h,
+				_1: {
+					ctor: '::',
+					_0: s,
+					_1: {ctor: '[]'}
+				}
+			});
+		var _p0 = A2(_elm_lang$core$Dict$get, colorString, _user$project$ColorHelper$colorTable);
+		if (_p0.ctor === 'Just') {
+			return _p0._0;
 		} else {
 			return 'magenta';
 		}
