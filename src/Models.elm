@@ -3,14 +3,25 @@ module Models exposing (..)
 import ColorHelper exposing (hueAndShadeToHex)
 import Date exposing (Date)
 import Date.Extra.Duration exposing (diffDays)
+import Date.Extra.TimeUnit exposing (TimeUnit, startOfTime)
+import Dict exposing (Dict)
+import Json.Decode exposing (..)
+import Regex
+import Set exposing (Set)
+import TestData exposing (items)
+
+
+type alias CalendarModel =
+    { categories : List Category
+    , start : Date
+    , end : Date
+    , items : List CalendarItem
+    }
 
 
 type alias Model =
     { currentDate : Maybe Date
-    , categories : List Category
-    , start : Date
-    , end : Date
-    , items : List CalendarItem
+    , calendarModel : CalendarModel
     }
 
 
@@ -26,12 +37,35 @@ type alias CalendarItem =
 type alias Category =
     { name : String
     , selected : Bool
-    , logo : String
     , hue : String
-    , leftColor : String
-    , leftColorDark : String
+    , backgroundColor : String
+    , backgroundColorDark : String
     , itemColor : String
     }
+
+
+iso8601ToDate : Decoder Date.Date
+iso8601ToDate =
+    string
+        |> andThen
+            (\string ->
+                case Date.fromString string of
+                    Ok dateAndTime ->
+                        succeed <| startOfTime Date.Extra.TimeUnit.Day dateAndTime
+
+                    Err error ->
+                        fail error
+            )
+
+
+duration : Decoder Int
+duration =
+    map2
+        (\start end ->
+            diffDays end start
+        )
+        (field "starts" iso8601ToDate)
+        (field "ends" iso8601ToDate)
 
 
 calendarItem : String -> String -> String -> String -> Result String CalendarItem
@@ -50,57 +84,78 @@ calendarItem itemText itemCategory itemStart itemEnd =
             Err ("date parse problem " ++ itemStart ++ " " ++ itemEnd)
 
 
+calendarItemDecoder : Decoder CalendarItem
+calendarItemDecoder =
+    map5 CalendarItem
+        (field "starts" iso8601ToDate)
+        (field "ends" iso8601ToDate)
+        (field "title" string)
+        (field "site" string)
+        duration
+
+
 categories : List Category
 categories =
-    [ { name = "meh.com"
-      , logo = "https://s3.amazonaws.com/mediocre-static/mehlogo.png"
-      , hue = "green"
-      }
-    , { name = "morningsave.com"
-      , logo = "https://s3.amazonaws.com/mediocre-static/morningsavelogo.png"
-      , hue = "cyan"
-      }
-    , { name = "checkout.org"
-      , logo = "https://s3.amazonaws.com/mediocre-static/checkoutlogo.png"
-      , hue = "blue-grey"
-      }
-    , { name = "video"
-      , logo = "https://s3.amazonaws.com/mediocre-static/videologo.png"
-      , hue = "red"
-      }
-    ]
+    let
+        categoryColors =
+            Dict.fromList
+                [ ( "meh.com", "green" )
+                , ( "morningsave.com", "cyan" )
+                , ( "checkout.org", "blue-grey" )
+                , ( "video", "red" )
+                ]
+
+        defaultColor =
+            "yellow"
+    in
+    testData
+        |> List.map (\c -> c.category)
+        |> Set.fromList
+        |> Set.toList
         |> List.map
-            (\c ->
-                { name = c.name
-                , selected = True
-                , logo = c.logo
-                , hue = c.hue
-                , leftColor = ColorHelper.hueAndShadeToHex c.hue "500"
-                , leftColorDark = ColorHelper.hueAndShadeToHex c.hue "900"
-                , itemColor = ColorHelper.hueAndShadeToHex c.hue "300"
-                }
+            (\name ->
+                case Dict.get name categoryColors of
+                    Just hue ->
+                        { name = name
+                        , selected = True
+                        , hue = hue
+                        , backgroundColor = ColorHelper.hueAndShadeToHex hue "500"
+                        , backgroundColorDark = ColorHelper.hueAndShadeToHex hue "900"
+                        , itemColor = ColorHelper.hueAndShadeToHex hue "300"
+                        }
+
+                    Nothing ->
+                        { name = name
+                        , selected = True
+                        , hue = defaultColor
+                        , backgroundColor = ColorHelper.hueAndShadeToHex defaultColor "500"
+                        , backgroundColorDark = ColorHelper.hueAndShadeToHex defaultColor "900"
+                        , itemColor = ColorHelper.hueAndShadeToHex defaultColor "300"
+                        }
             )
 
 
 testData : List CalendarItem
 testData =
-    [ calendarItem "Meh Shirt" "meh.com" "7/9/2017" "7/10/2017"
-    , calendarItem "Meh's 3rd Birthday" "meh.com" "7/10/2017" "7/11/2017"
-    , calendarItem "Bormioli Momenti Wine Glasses (4 Pack Red/White)" "meh.com" "7/11/2017" "7/12/2017"
-    , calendarItem "MiGear Extreme X Action Camera" "meh.com" "7/12/2017" "7/13/2017"
-    , calendarItem "Riviera Hoverboard" "meh.com" "7/13/2017" "7/14/2017"
-    , calendarItem "Quikut 20-Piece Knife Set" "meh.com" "7/14/2017" "7/15/2017"
-    , calendarItem "Shark Professional Series Steam Pocket Mop (Refurbished)" "meh.com" "7/15/2017" "7/16/2017"
-    , calendarItem "Jewelry by Pacific Pearls" "morningsave.com" "7/9/2017" "7/13/2017"
-    , calendarItem "THIS WEEK ON TV" "checkout.org" "7/1/2017" "7/16/2017"
-    , calendarItem "TMZ SPORTS DEALS" "checkout.org" "7/9/2017" "7/30/2017"
-    , calendarItem "Happy Birthday to Meh" "video" "7/9/2017" "7/10/2017"
-    , calendarItem "It's a Meh-rathon" "video" "7/10/2017" "7/11/2017"
-    , calendarItem "Garfield Hates Mondays: Maybe It Bothers Me More Than It Should" "video" "7/11/2017" "7/13/2017"
-    , calendarItem "Clocks: Mad Ape Den Karaoke" "video" "7/13/2017" "7/15/2017"
-    , calendarItem "Possum Head Chronicles, series 03 SUPERCUT" "video" "7/15/2017" "7/16/2017"
-    ]
-        |> List.filterMap Result.toMaybe
+    let
+        removeTabs =
+            Regex.replace Regex.All (Regex.regex "\\t") (\_ -> "")
+
+        removeBackslashes =
+            Regex.replace Regex.All (Regex.regex "W\\\\Sheath") (\_ -> "")
+    in
+    case
+        TestData.items
+            |> removeBackslashes
+            |> removeTabs
+            |> Json.Decode.decodeString (list calendarItemDecoder)
+    of
+        Ok items ->
+            items
+                |> List.filter (\i -> i.category == "meh.com")
+
+        Err err ->
+            Debug.log err []
 
 
 partitionWhile : (a -> Bool) -> List a -> ( List a, List a )

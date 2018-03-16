@@ -24,10 +24,12 @@ main =
 init : ( Model, Cmd Msg )
 init =
     ( { currentDate = Nothing
-      , categories = Models.categories
-      , items = Models.testData
-      , start = unsafeFromString "7/9/2017"
-      , end = unsafeFromString "7/15/2017"
+      , calendarModel =
+            { categories = Models.categories
+            , items = Models.testData
+            , start = unsafeFromString "9/3/2017"
+            , end = unsafeFromString "9/9/2017"
+            }
       }
     , Cmd.batch
         [ Task.perform SetDate Date.now

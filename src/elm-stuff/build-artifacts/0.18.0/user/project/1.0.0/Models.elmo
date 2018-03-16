@@ -46,36 +46,6 @@ var _user$project$Models$partitionWhile = F2(
 			{ctor: '[]'},
 			l);
 	});
-var _user$project$Models$categories = A2(
-	_elm_lang$core$List$map,
-	function (c) {
-		return {
-			name: c.name,
-			selected: true,
-			logo: c.logo,
-			hue: c.hue,
-			leftColor: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, '500'),
-			leftColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, '900'),
-			itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, c.hue, '300')
-		};
-	},
-	{
-		ctor: '::',
-		_0: {name: 'meh.com', logo: 'https://s3.amazonaws.com/mediocre-static/mehlogo.png', hue: 'green'},
-		_1: {
-			ctor: '::',
-			_0: {name: 'morningsave.com', logo: 'https://s3.amazonaws.com/mediocre-static/morningsavelogo.png', hue: 'cyan'},
-			_1: {
-				ctor: '::',
-				_0: {name: 'checkout.org', logo: 'https://s3.amazonaws.com/mediocre-static/checkoutlogo.png', hue: 'blue-grey'},
-				_1: {
-					ctor: '::',
-					_0: {name: 'video', logo: 'https://s3.amazonaws.com/mediocre-static/videologo.png', hue: 'red'},
-					_1: {ctor: '[]'}
-				}
-			}
-		}
-	});
 var _user$project$Models$calendarItem = F4(
 	function (itemText, itemCategory, itemStart, itemEnd) {
 		var _p3 = {
@@ -105,79 +75,135 @@ var _user$project$Models$calendarItem = F4(
 						A2(_elm_lang$core$Basics_ops['++'], ' ', itemEnd))));
 		}
 	});
-var _user$project$Models$testData = A2(
-	_elm_lang$core$List$filterMap,
-	_elm_lang$core$Result$toMaybe,
-	{
-		ctor: '::',
-		_0: A4(_user$project$Models$calendarItem, 'Meh Shirt', 'meh.com', '7/9/2017', '7/10/2017'),
-		_1: {
-			ctor: '::',
-			_0: A4(_user$project$Models$calendarItem, 'Meh\'s 3rd Birthday', 'meh.com', '7/10/2017', '7/11/2017'),
-			_1: {
-				ctor: '::',
-				_0: A4(_user$project$Models$calendarItem, 'Bormioli Momenti Wine Glasses (4 Pack Red/White)', 'meh.com', '7/11/2017', '7/12/2017'),
-				_1: {
-					ctor: '::',
-					_0: A4(_user$project$Models$calendarItem, 'MiGear Extreme X Action Camera', 'meh.com', '7/12/2017', '7/13/2017'),
-					_1: {
-						ctor: '::',
-						_0: A4(_user$project$Models$calendarItem, 'Riviera Hoverboard', 'meh.com', '7/13/2017', '7/14/2017'),
-						_1: {
-							ctor: '::',
-							_0: A4(_user$project$Models$calendarItem, 'Quikut 20-Piece Knife Set', 'meh.com', '7/14/2017', '7/15/2017'),
-							_1: {
-								ctor: '::',
-								_0: A4(_user$project$Models$calendarItem, 'Shark Professional Series Steam Pocket Mop (Refurbished)', 'meh.com', '7/15/2017', '7/16/2017'),
-								_1: {
-									ctor: '::',
-									_0: A4(_user$project$Models$calendarItem, 'Jewelry by Pacific Pearls', 'morningsave.com', '7/9/2017', '7/13/2017'),
-									_1: {
-										ctor: '::',
-										_0: A4(_user$project$Models$calendarItem, 'THIS WEEK ON TV', 'checkout.org', '7/1/2017', '7/16/2017'),
-										_1: {
-											ctor: '::',
-											_0: A4(_user$project$Models$calendarItem, 'TMZ SPORTS DEALS', 'checkout.org', '7/9/2017', '7/30/2017'),
-											_1: {
-												ctor: '::',
-												_0: A4(_user$project$Models$calendarItem, 'Happy Birthday to Meh', 'video', '7/9/2017', '7/10/2017'),
-												_1: {
-													ctor: '::',
-													_0: A4(_user$project$Models$calendarItem, 'It\'s a Meh-rathon', 'video', '7/10/2017', '7/11/2017'),
-													_1: {
-														ctor: '::',
-														_0: A4(_user$project$Models$calendarItem, 'Garfield Hates Mondays: Maybe It Bothers Me More Than It Should', 'video', '7/11/2017', '7/13/2017'),
-														_1: {
-															ctor: '::',
-															_0: A4(_user$project$Models$calendarItem, 'Clocks: Mad Ape Den Karaoke', 'video', '7/13/2017', '7/15/2017'),
-															_1: {
-																ctor: '::',
-																_0: A4(_user$project$Models$calendarItem, 'Possum Head Chronicles, series 03 SUPERCUT', 'video', '7/15/2017', '7/16/2017'),
-																_1: {ctor: '[]'}
-															}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+var _user$project$Models$iso8601ToDate = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	function (string) {
+		var _p6 = _elm_lang$core$Date$fromString(string);
+		if (_p6.ctor === 'Ok') {
+			return _elm_lang$core$Json_Decode$succeed(
+				A2(_rluiten$elm_date_extra$Date_Extra_TimeUnit$startOfTime, _rluiten$elm_date_extra$Date_Extra_TimeUnit$Day, _p6._0));
+		} else {
+			return _elm_lang$core$Json_Decode$fail(_p6._0);
 		}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _user$project$Models$duration = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (start, end) {
+			return A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, end, start);
+		}),
+	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
+	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate));
+var _user$project$Models$CalendarModel = F4(
+	function (a, b, c, d) {
+		return {categories: a, start: b, end: c, items: d};
 	});
-var _user$project$Models$Model = F5(
-	function (a, b, c, d, e) {
-		return {currentDate: a, categories: b, start: c, end: d, items: e};
+var _user$project$Models$Model = F2(
+	function (a, b) {
+		return {currentDate: a, calendarModel: b};
 	});
 var _user$project$Models$CalendarItem = F5(
 	function (a, b, c, d, e) {
 		return {start: a, end: b, text: c, category: d, duration: e};
 	});
-var _user$project$Models$Category = F7(
-	function (a, b, c, d, e, f, g) {
-		return {name: a, selected: b, logo: c, hue: d, leftColor: e, leftColorDark: f, itemColor: g};
+var _user$project$Models$calendarItemDecoder = A6(
+	_elm_lang$core$Json_Decode$map5,
+	_user$project$Models$CalendarItem,
+	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
+	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate),
+	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'site', _elm_lang$core$Json_Decode$string),
+	_user$project$Models$duration);
+var _user$project$Models$testData = function () {
+	var removeBackslashes = A3(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('W\\\\Sheath'),
+		function (_p7) {
+			return '';
+		});
+	var removeTabs = A3(
+		_elm_lang$core$Regex$replace,
+		_elm_lang$core$Regex$All,
+		_elm_lang$core$Regex$regex('\\t'),
+		function (_p8) {
+			return '';
+		});
+	var _p9 = A2(
+		_elm_lang$core$Json_Decode$decodeString,
+		_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemDecoder),
+		removeTabs(
+			removeBackslashes(_user$project$TestData$items)));
+	if (_p9.ctor === 'Ok') {
+		return A2(
+			_elm_lang$core$List$filter,
+			function (i) {
+				return _elm_lang$core$Native_Utils.eq(i.category, 'meh.com');
+			},
+			_p9._0);
+	} else {
+		return A2(
+			_elm_lang$core$Debug$log,
+			_p9._0,
+			{ctor: '[]'});
+	}
+}();
+var _user$project$Models$categories = function () {
+	var defaultColor = 'yellow';
+	var categoryColors = _elm_lang$core$Dict$fromList(
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'meh.com', _1: 'green'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'morningsave.com', _1: 'cyan'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'checkout.org', _1: 'blue-grey'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'video', _1: 'red'},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+	return A2(
+		_elm_lang$core$List$map,
+		function (name) {
+			var _p10 = A2(_elm_lang$core$Dict$get, name, categoryColors);
+			if (_p10.ctor === 'Just') {
+				var _p11 = _p10._0;
+				return {
+					name: name,
+					selected: true,
+					hue: _p11,
+					backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p11, '500'),
+					backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, _p11, '900'),
+					itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p11, '300')
+				};
+			} else {
+				return {
+					name: name,
+					selected: true,
+					hue: defaultColor,
+					backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '500'),
+					backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '900'),
+					itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '300')
+				};
+			}
+		},
+		_elm_lang$core$Set$toList(
+			_elm_lang$core$Set$fromList(
+				A2(
+					_elm_lang$core$List$map,
+					function (c) {
+						return c.category;
+					},
+					_user$project$Models$testData))));
+}();
+var _user$project$Models$Category = F6(
+	function (a, b, c, d, e, f) {
+		return {name: a, selected: b, hue: c, backgroundColor: d, backgroundColorDark: e, itemColor: f};
 	});

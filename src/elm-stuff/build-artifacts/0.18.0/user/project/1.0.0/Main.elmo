@@ -12,8 +12,8 @@ var _user$project$Main$init = {
 		currentDate: _elm_lang$core$Maybe$Nothing,
 		categories: _user$project$Models$categories,
 		items: _user$project$Models$testData,
-		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/9/2017'),
-		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('7/15/2017')
+		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('9/3/2017'),
+		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('9/9/2017')
 	},
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{
