@@ -3,17 +3,23 @@ var _user$project$Main$subscriptions = function (model) {
 		{
 			ctor: '::',
 			_0: _user$project$Ports$filteredCategories(_user$project$Msgs$FilteredCategories),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _user$project$Ports$searchResults(_user$project$Msgs$SearchResults),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _user$project$Main$init = {
 	ctor: '_Tuple2',
 	_0: {
-		currentDate: _elm_lang$core$Maybe$Nothing,
-		categories: _user$project$Models$categories,
-		items: _user$project$Models$testData,
-		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('9/3/2017'),
-		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('9/9/2017')
+		currentDate: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
+		categories: {ctor: '[]'},
+		items: {ctor: '[]'},
+		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
+		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
+		query: '',
+		animState: _user$project$Models$Loading
 	},
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{

@@ -3,26 +3,41 @@ var _user$project$Update$update = F2(
 		var _p0 = msg;
 		switch (_p0.ctor) {
 			case 'SetDate':
+				var _p1 = _p0._0;
+				var newEnd = _user$project$Models$endOfWeek(_p1);
+				var newStart = _user$project$Models$beginningOfWeek(_p1);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							currentDate: _elm_lang$core$Maybe$Just(_p0._0)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
+						{currentDate: _p1, start: newStart, end: newEnd}),
+					_1: _user$project$Ports$search(
+						A3(
+							_user$project$Models$SearchQuery,
+							'',
+							_rluiten$elm_date_extra$Date_Extra_Format$isoString(newStart),
+							_rluiten$elm_date_extra$Date_Extra_Format$isoString(newEnd)))
 				};
 			case 'AdjustCalendar':
-				var _p1 = _p0._0;
+				var _p2 = _p0._0;
+				var newEnd = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p2, model.end);
+				var newStart = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p2, model.start);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							start: A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p1, model.start),
-							end: A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p1, model.end)
+							start: newStart,
+							end: newEnd,
+							items: {ctor: '[]'},
+							animState: _user$project$Models$Loading
 						}),
-					_1: _elm_lang$core$Platform_Cmd$none
+					_1: _user$project$Ports$search(
+						A3(
+							_user$project$Models$SearchQuery,
+							model.query,
+							_rluiten$elm_date_extra$Date_Extra_Format$isoString(newStart),
+							_rluiten$elm_date_extra$Date_Extra_Format$isoString(newEnd)))
 				};
 			case 'ToggleCategory':
 				var updatedCategories = A2(
@@ -46,10 +61,10 @@ var _user$project$Update$update = F2(
 							},
 							A2(
 								_elm_lang$core$List$filter,
-								function (_p2) {
+								function (_p3) {
 									return !function (_) {
 										return _.selected;
-									}(_p2);
+									}(_p3);
 								},
 								updatedCategories)))
 				};
@@ -60,8 +75,8 @@ var _user$project$Update$update = F2(
 					_1: _user$project$Ports$retrieveFilteredCategories(
 						{ctor: '_Tuple0'})
 				};
-			default:
-				var filteredCategories = A2(
+			case 'FilteredCategories':
+				var updatedCategories = A2(
 					_elm_lang$core$List$map,
 					function (c) {
 						return A2(_elm_lang$core$List$member, c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
@@ -75,7 +90,59 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{categories: filteredCategories}),
+						{categories: updatedCategories}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Search':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{animState: _user$project$Models$Loading}),
+					_1: _user$project$Ports$search(
+						A3(
+							_user$project$Models$SearchQuery,
+							model.query,
+							_rluiten$elm_date_extra$Date_Extra_Format$isoString(model.start),
+							_rluiten$elm_date_extra$Date_Extra_Format$isoString(model.end)))
+				};
+			case 'SearchResults':
+				var newItems = function () {
+					var _p4 = A2(
+						_elm_lang$core$Json_Decode$decodeValue,
+						_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemDecoder),
+						A2(_elm_lang$core$Debug$log, 'got here', _p0._0));
+					if (_p4.ctor === 'Ok') {
+						return A2(
+							_elm_lang$core$List$filter,
+							function (i) {
+								return !_elm_lang$core$String$isEmpty(i.mediaUrl);
+							},
+							_p4._0);
+					} else {
+						return A2(
+							_elm_lang$core$Debug$log,
+							_p4._0,
+							{ctor: '[]'});
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							items: newItems,
+							categories: _user$project$Models$categories(newItems),
+							animState: _user$project$Models$Steady
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{query: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}

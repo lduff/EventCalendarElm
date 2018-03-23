@@ -1,6 +1,7 @@
 module Msgs exposing (Msg(..))
 
 import Date exposing (Date)
+import Json.Decode exposing (Value)
 
 
 type Msg
@@ -9,3 +10,6 @@ type Msg
     | ToggleCategory String
     | RetrieveFilteredCategories
     | FilteredCategories (List String)
+    | Search
+    | SearchResults Value
+    | ChangeQuery String

@@ -14,3 +14,9 @@ var _user$project$Ports$storeFilteredCategories = _elm_lang$core$Native_Platform
 				return v;
 			});
 	});
+var _user$project$Ports$search = _elm_lang$core$Native_Platform.outgoingPort(
+	'search',
+	function (v) {
+		return {query: v.query, starts: v.starts, ends: v.ends};
+	});
+var _user$project$Ports$searchResults = _elm_lang$core$Native_Platform.incomingPort('searchResults', _elm_lang$core$Json_Decode$value);

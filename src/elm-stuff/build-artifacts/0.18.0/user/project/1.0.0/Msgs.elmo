@@ -1,3 +1,10 @@
+var _user$project$Msgs$ChangeQuery = function (a) {
+	return {ctor: 'ChangeQuery', _0: a};
+};
+var _user$project$Msgs$SearchResults = function (a) {
+	return {ctor: 'SearchResults', _0: a};
+};
+var _user$project$Msgs$Search = {ctor: 'Search'};
 var _user$project$Msgs$FilteredCategories = function (a) {
 	return {ctor: 'FilteredCategories', _0: a};
 };

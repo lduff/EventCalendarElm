@@ -1,44 +1,242 @@
-var _user$project$Calendar$calendarItem = F3(
-	function (calendarStart, calendarEnd, item) {
+var _user$project$Calendar$calendarItem = F4(
+	function (category, calendarStart, calendarEnd, item) {
+		var iconClass = function () {
+			var _p0 = item.eventType;
+			switch (_p0) {
+				case 'catalog':
+					return 'fas fa-dollar-sign';
+				case 'poll':
+					return 'fas fa-chart-bar';
+				case 'video':
+					return 'fas fa-video';
+				default:
+					return '';
+			}
+		}();
+		var continuesToNext = A3(
+			_rluiten$elm_date_extra$Date_Extra_Compare$is,
+			_rluiten$elm_date_extra$Date_Extra_Compare$After,
+			item.end,
+			A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, 1, calendarEnd));
+		var continuesFromPrev = A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Before, item.start, calendarStart);
+		var startEndText = function () {
+			var _p1 = {ctor: '_Tuple2', _0: continuesFromPrev, _1: continuesToNext};
+			if (_p1._0 === true) {
+				if (_p1._1 === true) {
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '« %B %e', item.start),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							' through ',
+							A3(
+								_rluiten$elm_date_extra$Date_Extra_Format$format,
+								_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config,
+								'%B %e »',
+								A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, -1, item.end))));
+				} else {
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						'« from ',
+						A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%B %e', item.start));
+				}
+			} else {
+				if (_p1._1 === true) {
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						'through ',
+						A3(
+							_rluiten$elm_date_extra$Date_Extra_Format$format,
+							_rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config,
+							'%B %e »',
+							A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, -1, item.end)));
+				} else {
+					return '';
+				}
+			}
+		}();
+		var itemEnd = A2(
+			_elm_lang$core$Basics$min,
+			2 + A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, calendarEnd, calendarStart),
+			1 + A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, item.end, calendarStart));
+		var itemStart = A2(
+			_elm_lang$core$Basics$max,
+			1,
+			1 + A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, item.start, calendarStart));
 		return A2(
 			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('calendar-item'),
-				_1: {ctor: '[]'}
+				_0: _elm_lang$html$Html_Attributes$class(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'calendar-item is-size-7 has-text-centered',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							continuesFromPrev ? ' calendar-item-continues-from-prev' : '',
+							continuesToNext ? ' calendar-item-continues-to-next' : ''))),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'backgroundColor', _1: category.itemColor},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'border-color', _1: category.backgroundColor},
+								_1: {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: 'grid-column-start',
+										_1: _elm_lang$core$Basics$toString(itemStart)
+									},
+									_1: {
+										ctor: '::',
+										_0: {
+											ctor: '_Tuple2',
+											_0: 'grid-column-end',
+											_1: _elm_lang$core$Basics$toString(itemEnd)
+										},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
 			},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text(item.text),
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('has-text-weight-semibold'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(item.text),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: (A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Before, item.start, calendarStart) || A3(
-						_rluiten$elm_date_extra$Date_Extra_Compare$is,
-						_rluiten$elm_date_extra$Date_Extra_Compare$After,
-						item.end,
-						A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, 1, calendarEnd))) ? A2(
-						_elm_lang$html$Html$p,
+					_0: A2(
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('is-size-7'),
+							_0: _elm_lang$html$Html_Attributes$class('calendar-item-card'),
 							_1: {ctor: '[]'}
 						},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '« %B %e', item.start)),
+							_0: (continuesFromPrev || continuesToNext) ? A2(
+								_elm_lang$html$Html$p,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('is-size-7'),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(startEndText),
+									_1: {ctor: '[]'}
+								}) : _elm_lang$html$Html$text(''),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html$text(' to '),
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('calendar-item-photo'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: (!_elm_lang$core$String$isEmpty(item.photo)) ? A2(
+											_elm_lang$html$Html$img,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$src(item.photo),
+												_1: {ctor: '[]'}
+											},
+											{ctor: '[]'}) : _elm_lang$html$Html$text(''),
+										_1: {ctor: '[]'}
+									}),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%B %e »', item.end)),
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('calendar-item-buttons'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: (!_elm_lang$core$String$isEmpty(item.mediaUrl)) ? A2(
+												_elm_lang$html$Html$a,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$href(item.mediaUrl),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$target('_blank'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('button is-primary is-small'),
+															_1: {ctor: '[]'}
+														}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Preview'),
+													_1: {ctor: '[]'}
+												}) : _elm_lang$html$Html$text(''),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$a,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$href(item.url),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$class('button is-link is-small'),
+															_1: {ctor: '[]'}
+														}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('Edit'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}),
 									_1: {ctor: '[]'}
 								}
 							}
-						}) : _elm_lang$html$Html$text(''),
-					_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$i,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class(
+									A2(_elm_lang$core$Basics_ops['++'], 'calendar-item-icon ', iconClass)),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$title(item.eventType),
+									_1: {ctor: '[]'}
+								}
+							},
+							{ctor: '[]'}),
+						_1: {ctor: '[]'}
+					}
 				}
 			});
 	});
@@ -49,22 +247,53 @@ var _user$project$Calendar$categoryItems = F4(
 			{
 				ctor: '::',
 				_0: _elm_lang$html$Html_Attributes$class('calendar-category-items'),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'backgroundColor', _1: category.backgroundColor},
+							_1: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'border-left',
+									_1: A2(_elm_lang$core$Basics_ops['++'], '4px solid ', category.backgroundColorDark)
+								},
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
 			},
 			A2(
 				_elm_lang$core$List$map,
 				function (item) {
-					return A3(_user$project$Calendar$calendarItem, calendarStart, calendarEnd, item);
+					return A4(_user$project$Calendar$calendarItem, category, calendarStart, calendarEnd, item);
 				},
 				items));
 	});
-var _user$project$Calendar$category = F4(
-	function (category, calendarStart, calendarEnd, itemsForCategory) {
+var _user$project$Calendar$category = F3(
+	function (model, category, itemsForCategory) {
 		return A2(
 			_elm_lang$html$Html$div,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('calendar-category'),
+				_0: _elm_lang$html$Html_Attributes$class(
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'calendar-category',
+						function () {
+							var _p2 = model.animState;
+							switch (_p2.ctor) {
+								case 'SlidingLeft':
+									return ' slide-left';
+								case 'SlidingRight':
+									return ' slide-right';
+								default:
+									return '';
+							}
+						}())),
 				_1: {ctor: '[]'}
 			},
 			{
@@ -73,7 +302,7 @@ var _user$project$Calendar$category = F4(
 					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('calendar-category-header'),
+						_0: _elm_lang$html$Html_Attributes$class('calendar-category-name has-text-weight-bold is-size-4'),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$html$Html_Attributes$style(
@@ -87,38 +316,59 @@ var _user$project$Calendar$category = F4(
 											_0: 'border-left',
 											_1: A2(_elm_lang$core$Basics_ops['++'], '4px solid ', category.backgroundColorDark)
 										},
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'color', _1: category.lightItemColor},
+											_1: {ctor: '[]'}
+										}
 									}
 								}),
 							_1: {ctor: '[]'}
 						}
 					},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(category.name),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$div,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('calendar-category-name'),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(category.name),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
+							_0: _elm_lang$html$Html_Attributes$class('calendar-category-header'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'backgroundColor', _1: category.backgroundColor},
+										_1: {
+											ctor: '::',
+											_0: {
+												ctor: '_Tuple2',
+												_0: 'border-left',
+												_1: A2(_elm_lang$core$Basics_ops['++'], '4px solid ', category.backgroundColorDark)
+											},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
 						},
 						A2(
 							_elm_lang$core$List$map,
 							function (d) {
+								var dayCssClass = _elm_lang$core$Native_Utils.eq(
+									_user$project$Models$removeTime(d),
+									_user$project$Models$removeTime(model.currentDate)) ? ' calendar-category-day-header-current-date' : '';
 								return A2(
 									_elm_lang$html$Html$div,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('calendar-category-day-header has-text-grey-dark has-text-weight-bold has-text-centered'),
+										_0: _elm_lang$html$Html_Attributes$class(
+											A2(_elm_lang$core$Basics_ops['++'], 'calendar-category-day-header has-text-grey-dark has-text-weight-bold has-text-centered', dayCssClass)),
 										_1: {ctor: '[]'}
 									},
 									{
@@ -131,26 +381,27 @@ var _user$project$Calendar$category = F4(
 							A2(
 								_elm_lang$core$List$map,
 								function (i) {
-									return A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, i, calendarStart);
+									return A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, i, model.start);
 								},
-								A2(_elm_lang$core$List$range, 0, 6))))),
-				_1: {
-					ctor: '::',
-					_0: A4(
-						_user$project$Calendar$categoryItems,
-						category,
-						calendarStart,
-						calendarEnd,
-						A2(
-							_elm_lang$core$List$sortBy,
-							function (_p0) {
-								return _elm_lang$core$Date$toTime(
-									function (_) {
-										return _.start;
-									}(_p0));
-							},
-							itemsForCategory)),
-					_1: {ctor: '[]'}
+								A2(_elm_lang$core$List$range, 0, 6)))),
+					_1: {
+						ctor: '::',
+						_0: A4(
+							_user$project$Calendar$categoryItems,
+							category,
+							model.start,
+							model.end,
+							A2(
+								_elm_lang$core$List$sortBy,
+								function (i) {
+									return A2(
+										_elm_lang$core$Basics_ops['++'],
+										i.eventType,
+										_rluiten$elm_date_extra$Date_Extra_Format$isoString(i.start));
+								},
+								itemsForCategory)),
+						_1: {ctor: '[]'}
+					}
 				}
 			});
 	});
@@ -177,7 +428,7 @@ var _user$project$Calendar$calendarHeader = function (model) {
 						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('button'),
+							_0: _elm_lang$html$Html_Attributes$class('button is-white'),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Events$onClick(
@@ -232,7 +483,7 @@ var _user$project$Calendar$calendarHeader = function (model) {
 								_elm_lang$html$Html$button,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('button'),
+									_0: _elm_lang$html$Html_Attributes$class('button is-white'),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onClick(
@@ -268,7 +519,7 @@ var _user$project$Calendar$calendar = function (model) {
 		A2(
 			_elm_lang$core$List$filter,
 			function (i) {
-				return (A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Before, i.start, model.start) && A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$After, i.end, model.end)) || (A4(_rluiten$elm_date_extra$Date_Extra_Compare$is3, _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpenStart, i.start, model.start, model.end) || A4(_rluiten$elm_date_extra$Date_Extra_Compare$is3, _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpenEnd, i.end, model.start, model.end));
+				return (A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$Before, i.start, model.start) && A3(_rluiten$elm_date_extra$Date_Extra_Compare$is, _rluiten$elm_date_extra$Date_Extra_Compare$After, i.end, model.end)) || (A4(_rluiten$elm_date_extra$Date_Extra_Compare$is3, _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpenEnd, i.start, model.start, model.end) || A4(_rluiten$elm_date_extra$Date_Extra_Compare$is3, _rluiten$elm_date_extra$Date_Extra_Compare$BetweenOpenEnd, i.end, model.start, model.end));
 			},
 			model.items));
 	return A2(
@@ -288,9 +539,9 @@ var _user$project$Calendar$calendar = function (model) {
 			A2(
 				_elm_lang$core$List$map,
 				function (c) {
-					var _p1 = A2(_elm_lang$core$Dict$get, c.name, calendarItemsDict);
-					if (_p1.ctor === 'Just') {
-						return A4(_user$project$Calendar$category, c, model.start, model.end, _p1._0);
+					var _p3 = A2(_elm_lang$core$Dict$get, c.name, calendarItemsDict);
+					if (_p3.ctor === 'Just') {
+						return A3(_user$project$Calendar$category, model, c, _p3._0);
 					} else {
 						return _elm_lang$html$Html$text('');
 					}

@@ -1,7 +1,9 @@
 module Update exposing (update)
 
 import Date.Extra.Duration exposing (..)
-import Models exposing (Model)
+import Date.Extra.Format as Format
+import Json.Decode exposing (decodeValue, list)
+import Models exposing (AnimState(..), Model, beginningOfWeek, calendarItemDecoder, categories, endOfWeek)
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
 
@@ -10,14 +12,36 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SetDate d ->
-            ( { model | currentDate = Just d }, Cmd.none )
+            let
+                newStart =
+                    beginningOfWeek d
+
+                newEnd =
+                    endOfWeek d
+            in
+            ( { model
+                | currentDate = d
+                , start = newStart
+                , end = newEnd
+              }
+            , search <| Models.SearchQuery "" (Format.isoString newStart) (Format.isoString newEnd)
+            )
 
         AdjustCalendar days ->
+            let
+                newStart =
+                    add Day days model.start
+
+                newEnd =
+                    add Day days model.end
+            in
             ( { model
-                | start = add Day days model.start
-                , end = add Day days model.end
+                | start = newStart
+                , end = newEnd
+                , items = []
+                , animState = Loading
               }
-            , Cmd.none
+            , search <| Models.SearchQuery model.query (Format.isoString newStart) (Format.isoString newEnd)
             )
 
         ToggleCategory toggleCategory ->
@@ -45,7 +69,7 @@ update msg model =
 
         FilteredCategories categories ->
             let
-                filteredCategories =
+                updatedCategories =
                     model.categories
                         |> List.map
                             (\c ->
@@ -55,4 +79,30 @@ update msg model =
                                     { c | selected = True }
                             )
             in
-            ( { model | categories = filteredCategories }, Cmd.none )
+            ( { model | categories = updatedCategories }, Cmd.none )
+
+        Search ->
+            ( { model | animState = Loading }
+            , search <| Models.SearchQuery model.query (Format.isoString model.start) (Format.isoString model.end)
+            )
+
+        SearchResults value ->
+            let
+                newItems =
+                    case decodeValue (list calendarItemDecoder) (Debug.log "got here" value) of
+                        Ok items ->
+                            items |> List.filter (\i -> not <| String.isEmpty i.mediaUrl)
+
+                        Err err ->
+                            Debug.log err []
+            in
+            ( { model
+                | items = newItems
+                , categories = categories newItems
+                , animState = Steady
+              }
+            , Cmd.none
+            )
+
+        ChangeQuery value ->
+            ( { model | query = value }, Cmd.none )

@@ -1,155 +1,4 @@
-var _user$project$Models$partitionWhileInternal = F3(
-	function (predicate, acc, l) {
-		partitionWhileInternal:
-		while (true) {
-			var nextItem = _elm_lang$core$List$head(l);
-			var _p0 = nextItem;
-			if (_p0.ctor === 'Nothing') {
-				return {
-					ctor: '_Tuple2',
-					_0: acc,
-					_1: {ctor: '[]'}
-				};
-			} else {
-				var _p2 = _p0._0;
-				if (predicate(_p2)) {
-					var _p1 = _elm_lang$core$List$tail(l);
-					if (_p1.ctor === 'Nothing') {
-						return {
-							ctor: '_Tuple2',
-							_0: A2(_elm_lang$core$Basics_ops['++'], acc, l),
-							_1: {ctor: '[]'}
-						};
-					} else {
-						var _v2 = predicate,
-							_v3 = A2(
-							_elm_lang$core$Basics_ops['++'],
-							acc,
-							_elm_lang$core$List$singleton(_p2)),
-							_v4 = _p1._0;
-						predicate = _v2;
-						acc = _v3;
-						l = _v4;
-						continue partitionWhileInternal;
-					}
-				} else {
-					return {ctor: '_Tuple2', _0: acc, _1: l};
-				}
-			}
-		}
-	});
-var _user$project$Models$partitionWhile = F2(
-	function (predicate, l) {
-		return A3(
-			_user$project$Models$partitionWhileInternal,
-			predicate,
-			{ctor: '[]'},
-			l);
-	});
-var _user$project$Models$calendarItem = F4(
-	function (itemText, itemCategory, itemStart, itemEnd) {
-		var _p3 = {
-			ctor: '_Tuple2',
-			_0: _elm_lang$core$Date$fromString(itemStart),
-			_1: _elm_lang$core$Date$fromString(itemEnd)
-		};
-		if (((_p3.ctor === '_Tuple2') && (_p3._0.ctor === 'Ok')) && (_p3._1.ctor === 'Ok')) {
-			var _p5 = _p3._0._0;
-			var _p4 = _p3._1._0;
-			return _elm_lang$core$Result$Ok(
-				{
-					start: _p5,
-					end: _p4,
-					text: itemText,
-					category: itemCategory,
-					duration: A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, _p4, _p5)
-				});
-		} else {
-			return _elm_lang$core$Result$Err(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'date parse problem ',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						itemStart,
-						A2(_elm_lang$core$Basics_ops['++'], ' ', itemEnd))));
-		}
-	});
-var _user$project$Models$iso8601ToDate = A2(
-	_elm_lang$core$Json_Decode$andThen,
-	function (string) {
-		var _p6 = _elm_lang$core$Date$fromString(string);
-		if (_p6.ctor === 'Ok') {
-			return _elm_lang$core$Json_Decode$succeed(
-				A2(_rluiten$elm_date_extra$Date_Extra_TimeUnit$startOfTime, _rluiten$elm_date_extra$Date_Extra_TimeUnit$Day, _p6._0));
-		} else {
-			return _elm_lang$core$Json_Decode$fail(_p6._0);
-		}
-	},
-	_elm_lang$core$Json_Decode$string);
-var _user$project$Models$duration = A3(
-	_elm_lang$core$Json_Decode$map2,
-	F2(
-		function (start, end) {
-			return A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, end, start);
-		}),
-	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
-	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate));
-var _user$project$Models$CalendarModel = F4(
-	function (a, b, c, d) {
-		return {categories: a, start: b, end: c, items: d};
-	});
-var _user$project$Models$Model = F2(
-	function (a, b) {
-		return {currentDate: a, calendarModel: b};
-	});
-var _user$project$Models$CalendarItem = F5(
-	function (a, b, c, d, e) {
-		return {start: a, end: b, text: c, category: d, duration: e};
-	});
-var _user$project$Models$calendarItemDecoder = A6(
-	_elm_lang$core$Json_Decode$map5,
-	_user$project$Models$CalendarItem,
-	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
-	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate),
-	A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'site', _elm_lang$core$Json_Decode$string),
-	_user$project$Models$duration);
-var _user$project$Models$testData = function () {
-	var removeBackslashes = A3(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('W\\\\Sheath'),
-		function (_p7) {
-			return '';
-		});
-	var removeTabs = A3(
-		_elm_lang$core$Regex$replace,
-		_elm_lang$core$Regex$All,
-		_elm_lang$core$Regex$regex('\\t'),
-		function (_p8) {
-			return '';
-		});
-	var _p9 = A2(
-		_elm_lang$core$Json_Decode$decodeString,
-		_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemDecoder),
-		removeTabs(
-			removeBackslashes(_user$project$TestData$items)));
-	if (_p9.ctor === 'Ok') {
-		return A2(
-			_elm_lang$core$List$filter,
-			function (i) {
-				return _elm_lang$core$Native_Utils.eq(i.category, 'meh.com');
-			},
-			_p9._0);
-	} else {
-		return A2(
-			_elm_lang$core$Debug$log,
-			_p9._0,
-			{ctor: '[]'});
-	}
-}();
-var _user$project$Models$categories = function () {
+var _user$project$Models$categories = function (items) {
 	var defaultColor = 'yellow';
 	var categoryColors = _elm_lang$core$Dict$fromList(
 		{
@@ -163,47 +12,191 @@ var _user$project$Models$categories = function () {
 					_0: {ctor: '_Tuple2', _0: 'checkout.org', _1: 'blue-grey'},
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'video', _1: 'red'},
-						_1: {ctor: '[]'}
+						_0: {ctor: '_Tuple2', _0: 'casemates.com', _1: 'red'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'checkout.laughingsquid.com', _1: 'lime'},
+							_1: {ctor: '[]'}
+						}
 					}
 				}
 			}
 		});
 	return A2(
-		_elm_lang$core$List$map,
-		function (name) {
-			var _p10 = A2(_elm_lang$core$Dict$get, name, categoryColors);
-			if (_p10.ctor === 'Just') {
-				var _p11 = _p10._0;
-				return {
-					name: name,
-					selected: true,
-					hue: _p11,
-					backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p11, '500'),
-					backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, _p11, '900'),
-					itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p11, '300')
-				};
-			} else {
-				return {
-					name: name,
-					selected: true,
-					hue: defaultColor,
-					backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '500'),
-					backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '900'),
-					itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '300')
-				};
-			}
+		_elm_lang$core$List$sortBy,
+		function (_) {
+			return _.name;
 		},
-		_elm_lang$core$Set$toList(
-			_elm_lang$core$Set$fromList(
-				A2(
-					_elm_lang$core$List$map,
-					function (c) {
-						return c.category;
-					},
-					_user$project$Models$testData))));
-}();
-var _user$project$Models$Category = F6(
-	function (a, b, c, d, e, f) {
-		return {name: a, selected: b, hue: c, backgroundColor: d, backgroundColorDark: e, itemColor: f};
+		A2(
+			_elm_lang$core$List$map,
+			function (name) {
+				var _p0 = A2(_elm_lang$core$Dict$get, name, categoryColors);
+				if (_p0.ctor === 'Just') {
+					var _p1 = _p0._0;
+					return {
+						name: name,
+						selected: true,
+						hue: _p1,
+						backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '500'),
+						backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '700'),
+						itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '300'),
+						lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '100')
+					};
+				} else {
+					return {
+						name: name,
+						selected: true,
+						hue: defaultColor,
+						backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '500'),
+						backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '900'),
+						itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '300'),
+						lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '100')
+					};
+				}
+			},
+			_elm_lang$core$Set$toList(
+				_elm_lang$core$Set$fromList(
+					A2(
+						_elm_lang$core$List$map,
+						function (c) {
+							return c.category;
+						},
+						items)))));
+};
+var _user$project$Models$beginningOfWeek = function (date) {
+	return A3(
+		_rluiten$elm_date_extra$Date_Extra_Duration$add,
+		_rluiten$elm_date_extra$Date_Extra_Duration$Day,
+		-7,
+		A2(
+			_rluiten$elm_date_extra$Date_Extra_Field$fieldToDateClamp,
+			_rluiten$elm_date_extra$Date_Extra_Field$DayOfWeek(
+				{ctor: '_Tuple2', _0: _elm_lang$core$Date$Sun, _1: _elm_lang$core$Date$Sun}),
+			date));
+};
+var _user$project$Models$endOfWeek = function (date) {
+	return A3(
+		_rluiten$elm_date_extra$Date_Extra_Duration$add,
+		_rluiten$elm_date_extra$Date_Extra_Duration$Day,
+		6,
+		_user$project$Models$beginningOfWeek(date));
+};
+var _user$project$Models$removeTime = function (date) {
+	return A7(
+		_rluiten$elm_date_extra$Date_Extra_Create$dateFromFields,
+		_elm_lang$core$Date$year(date),
+		_elm_lang$core$Date$month(date),
+		_elm_lang$core$Date$day(date),
+		0,
+		0,
+		0,
+		0);
+};
+var _user$project$Models$iso8601ToDate = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	function (epochms) {
+		var dateAndTime = _elm_lang$core$Date$fromTime(
+			_elm_lang$core$Basics$toFloat(epochms));
+		var tzAdjusted = A3(
+			_rluiten$elm_date_extra$Date_Extra_Period$add,
+			_rluiten$elm_date_extra$Date_Extra_Period$Hour,
+			(_rluiten$elm_date_extra$Date_Extra_Create$getTimezoneOffset(dateAndTime) / 60) | 0,
+			dateAndTime);
+		return _elm_lang$core$Json_Decode$succeed(
+			_user$project$Models$removeTime(tzAdjusted));
+	},
+	_elm_lang$core$Json_Decode$int);
+var _user$project$Models$duration = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (start, end) {
+			return A2(_rluiten$elm_date_extra$Date_Extra_Duration$diffDays, end, start);
+		}),
+	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
+	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate));
+var _user$project$Models$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {currentDate: a, animState: b, query: c, categories: d, start: e, end: f, items: g};
 	});
+var _user$project$Models$CalendarItem = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {start: a, end: b, text: c, category: d, eventType: e, duration: f, children: g, url: h, photo: i, mediaUrl: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _user$project$Models$CalendarItemChild = F2(
+	function (a, b) {
+		return {url: a, photo: b};
+	});
+var _user$project$Models$calendarItemChildDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_user$project$Models$CalendarItemChild,
+	A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
+	A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string));
+var _user$project$Models$calendarItemDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+				A2(
+					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+					A2(
+						_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+						A2(
+							_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+							A2(
+								_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+								A2(
+									_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+									A2(
+										_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+										_elm_lang$core$Json_Decode$succeed(_user$project$Models$CalendarItem),
+										A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate)),
+									A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate)),
+								A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'site', _elm_lang$core$Json_Decode$string)),
+						A2(_elm_lang$core$Json_Decode$field, 'eventType', _elm_lang$core$Json_Decode$string)),
+					_user$project$Models$duration),
+				A2(
+					_elm_lang$core$Json_Decode$field,
+					'children',
+					_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemChildDecoder))),
+			A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string)),
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra$withDefault,
+			'',
+			A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string))),
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra$withDefault,
+		'',
+		A2(_elm_lang$core$Json_Decode$field, 'mediaUrl', _elm_lang$core$Json_Decode$string)));
+var _user$project$Models$Category = F7(
+	function (a, b, c, d, e, f, g) {
+		return {name: a, selected: b, hue: c, backgroundColor: d, backgroundColorDark: e, itemColor: f, lightItemColor: g};
+	});
+var _user$project$Models$SearchQuery = F3(
+	function (a, b, c) {
+		return {query: a, starts: b, ends: c};
+	});
+var _user$project$Models$Loading = {ctor: 'Loading'};
+var _user$project$Models$Steady = {ctor: 'Steady'};
+var _user$project$Models$SlidingRight = {ctor: 'SlidingRight'};
+var _user$project$Models$SlidingLeft = {ctor: 'SlidingLeft'};
