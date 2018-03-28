@@ -2,11 +2,15 @@ var _user$project$Main$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
 			ctor: '::',
-			_0: _user$project$Ports$filteredCategories(_user$project$Msgs$FilteredCategories),
+			_0: _user$project$Ports$userSettings(_user$project$Msgs$UserSettingsResults),
 			_1: {
 				ctor: '::',
 				_0: _user$project$Ports$searchResults(_user$project$Msgs$SearchResults),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _user$project$Ports$sources(_user$project$Msgs$Sources),
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
@@ -19,7 +23,9 @@ var _user$project$Main$init = {
 		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
 		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
 		query: '',
-		animState: _user$project$Models$Loading
+		animState: _user$project$Models$Loading,
+		selectedChannel: _user$project$Models$Retail,
+		calendarView: _user$project$Models$BySite
 	},
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{
@@ -27,7 +33,7 @@ var _user$project$Main$init = {
 			_0: A2(_elm_lang$core$Task$perform, _user$project$Msgs$SetDate, _elm_lang$core$Date$now),
 			_1: {
 				ctor: '::',
-				_0: _user$project$Ports$retrieveFilteredCategories(
+				_0: _user$project$Ports$getSources(
 					{ctor: '_Tuple0'}),
 				_1: {ctor: '[]'}
 			}

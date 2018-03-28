@@ -1,6 +1,5 @@
 module Calendar exposing (..)
 
-import Date exposing (Date, toTime)
 import Date.Extra.Compare exposing (..)
 import Date.Extra.Config.Config_en_us exposing (config)
 import Date.Extra.Duration as Duration exposing (..)
@@ -10,7 +9,8 @@ import Dict.Extra
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, onClick)
-import Models exposing (AnimState(..), CalendarItem, CalendarItemChild, Category, Model, removeTime)
+import List.Extra
+import Models exposing (AnimState(..), CalendarItem, CalendarItemChild, CalendarView(..), Category, ChannelView(..), Model, removeTime)
 import Msgs exposing (Msg(..))
 
 
@@ -30,21 +30,51 @@ calendar model =
                     )
                 |> Dict.Extra.groupBy .category
     in
-    div [ class "calendar" ]
-        ([ calendarHeader model
-         ]
-            ++ (model.categories
-                    |> List.map
-                        (\c ->
-                            case Dict.get c.name calendarItemsDict of
-                                Just items ->
-                                    category model c items
+    div [ class "calendar" ] <|
+        case model.calendarView of
+            BySite ->
+                calendarHeader model
+                    :: (model.categories
+                            |> List.filter
+                                (\c ->
+                                    model.selectedChannel
+                                        == All
+                                        || (c.channel == "retail" && model.selectedChannel == Retail && c.selected)
+                                        || (c.channel == "fulfillment" && model.selectedChannel == Fulfillment && c.selected)
+                                )
+                            |> List.map
+                                (\c ->
+                                    case Dict.get c.name calendarItemsDict of
+                                        Just items ->
+                                            category model c items
 
-                                Nothing ->
-                                    text ""
+                                        Nothing ->
+                                            text ""
+                                )
+                       )
+
+            Combined ->
+                [ calendarHeader model
+                , model.items
+                    |> List.filter
+                        (\i ->
+                            let
+                                ( channel, selected ) =
+                                    case List.Extra.find (\c -> c.name == i.category) model.categories of
+                                        Just category ->
+                                            ( category.channel, category.selected )
+
+                                        _ ->
+                                            ( "all", True )
+                            in
+                            model.selectedChannel
+                                == All
+                                || (channel == "retail" && model.selectedChannel == Retail && selected)
+                                || (channel == "fulfillment" && model.selectedChannel == Fulfillment && selected)
                         )
-               )
-        )
+                    |> List.Extra.uniqueBy (\i -> i.url)
+                    |> category model Models.combinedCategory
+                ]
 
 
 calendarHeader : Model -> Html Msg
@@ -66,29 +96,42 @@ calendarHeader model =
 category : Model -> Category -> List CalendarItem -> Html Msg
 category model category itemsForCategory =
     div
-        [ class
-            ("calendar-category"
-                ++ (case model.animState of
-                        SlidingLeft ->
-                            " slide-left"
-
-                        SlidingRight ->
-                            " slide-right"
-
-                        _ ->
-                            ""
-                   )
-            )
-        ]
+        [ class "calendar-category" ]
         [ div
-            [ class "calendar-category-name has-text-weight-bold is-size-4"
+            [ class "calendar-category-name"
             , style
                 [ ( "backgroundColor", category.backgroundColor )
                 , ( "border-left", "4px solid " ++ category.backgroundColorDark )
                 , ( "color", category.lightItemColor )
                 ]
             ]
-            [ text category.name ]
+            [ span [ class "has-text-weight-bold is-size-4" ] [ text category.name ]
+            , if category.name /= "All Events" then
+                a
+                    [ class "button is-small is-rounded is-info"
+                    , style
+                        [ ( "font-size", "8px" )
+                        , ( "vertical-align", "text-top" )
+                        , ( "margin-left", "10px" )
+                        ]
+                    , onClick <| ToggleCategory category.name
+                    ]
+                <|
+                    if category.selected then
+                        [ span [ class "icon is-small" ]
+                            [ i [ class "fas fa-eye-slash" ] []
+                            ]
+                        , span [] [ text "hide" ]
+                        ]
+                    else
+                        [ span [ class "icon is-small" ]
+                            [ i [ class "fas fa-eye" ] []
+                            ]
+                        , span [] [ text "show" ]
+                        ]
+              else
+                text ""
+            ]
         , div
             [ class "calendar-category-header"
             , style
@@ -118,13 +161,13 @@ category model category itemsForCategory =
                     )
             )
         , itemsForCategory
-            |> List.sortBy (\i -> i.eventType ++ isoString i.start)
-            |> categoryItems category model.start model.end
+            |> List.sortBy (\i -> i.category ++ i.eventType ++ isoString i.start)
+            |> categoryItems model category
         ]
 
 
-categoryItems : Category -> Date -> Date -> List CalendarItem -> Html Msg
-categoryItems category calendarStart calendarEnd items =
+categoryItems : Model -> Category -> List CalendarItem -> Html Msg
+categoryItems model category items =
     div
         [ class "calendar-category-items"
         , style
@@ -133,23 +176,23 @@ categoryItems category calendarStart calendarEnd items =
             ]
         ]
     <|
-        List.map (\item -> calendarItem category calendarStart calendarEnd item) items
+        List.map (\item -> calendarItem model category item) items
 
 
-calendarItem : Category -> Date -> Date -> CalendarItem -> Html Msg
-calendarItem category calendarStart calendarEnd item =
+calendarItem : Model -> Category -> CalendarItem -> Html Msg
+calendarItem model category item =
     let
         itemStart =
-            Basics.max 1 (1 + diffDays item.start calendarStart)
+            Basics.max 1 (1 + diffDays item.start model.start)
 
         itemEnd =
-            Basics.min (2 + diffDays calendarEnd calendarStart) (1 + diffDays item.end calendarStart)
+            Basics.min (2 + diffDays model.end model.start) (1 + diffDays item.end model.start)
 
         continuesFromPrev =
-            is Before item.start calendarStart
+            is Before (removeTime item.start) (removeTime model.start)
 
         continuesToNext =
-            is After item.end (Duration.add Duration.Day 1 calendarEnd)
+            is After item.end (Duration.add Duration.Day 1 model.end)
 
         iconClass =
             case item.eventType of
@@ -180,6 +223,19 @@ calendarItem category calendarStart calendarEnd item =
 
                 ( False, False ) ->
                     ""
+
+        ( itemColor, backgroundColor ) =
+            case model.calendarView of
+                BySite ->
+                    ( category.itemColor, category.backgroundColor )
+
+                Combined ->
+                    case List.Extra.find (\c -> c.name == item.category) model.categories of
+                        Just itemCategory ->
+                            ( itemCategory.itemColor, itemCategory.backgroundColor )
+
+                        _ ->
+                            ( category.itemColor, category.backgroundColor )
     in
     div
         [ class
@@ -196,8 +252,8 @@ calendarItem category calendarStart calendarEnd item =
                    )
             )
         , style
-            [ ( "backgroundColor", category.itemColor )
-            , ( "border-color", category.backgroundColor )
+            [ ( "backgroundColor", itemColor )
+            , ( "border-color", backgroundColor )
             , ( "grid-column-start", toString itemStart )
             , ( "grid-column-end", toString itemEnd )
             ]
@@ -214,7 +270,11 @@ calendarItem category calendarStart calendarEnd item =
                   else
                     text ""
                 ]
-            , div [ class "calendar-item-buttons" ]
+            , if model.calendarView == Combined || List.length item.allCategories > 1 then
+                tagsForCategories model item.allCategories
+              else
+                text ""
+            , div [ class "calendar-item-buttons buttons" ]
                 [ if not <| String.isEmpty item.mediaUrl then
                     a
                         [ href item.mediaUrl
@@ -243,3 +303,29 @@ calendarItem category calendarStart calendarEnd item =
             ]
             []
         ]
+
+
+tagsForCategories : Model -> List String -> Html Msg
+tagsForCategories model categories =
+    categories
+        |> List.map
+            (\c ->
+                let
+                    ( textColor, bgColor ) =
+                        case model.categories |> List.Extra.find (\cat -> cat.name == c) of
+                            Just c ->
+                                ( c.lightItemColor, c.backgroundColor )
+
+                            _ ->
+                                ( "", "" )
+                in
+                span
+                    [ class "tag"
+                    , style
+                        [ ( "color", textColor )
+                        , ( "background-color", bgColor )
+                        ]
+                    ]
+                    [ text c ]
+            )
+        |> div [ class "tags" ]

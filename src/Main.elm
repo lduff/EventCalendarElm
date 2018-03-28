@@ -3,7 +3,7 @@ module Main exposing (main)
 import Date exposing (..)
 import Date.Extra.Utils exposing (unsafeFromString)
 import Html exposing (..)
-import Models exposing (AnimState(..), Model)
+import Models exposing (AnimState(..), CalendarView(..), ChannelView(..), Model)
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
 import Task
@@ -30,10 +30,12 @@ init =
       , end = unsafeFromString "1/1/2017"
       , query = ""
       , animState = Loading
+      , selectedChannel = Retail
+      , calendarView = BySite
       }
     , Cmd.batch
         [ Task.perform SetDate Date.now
-        , retrieveFilteredCategories ()
+        , getSources ()
         ]
     )
 
@@ -41,6 +43,7 @@ init =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ filteredCategories Msgs.FilteredCategories
+        [ userSettings Msgs.UserSettingsResults
         , searchResults Msgs.SearchResults
+        , sources Msgs.Sources
         ]

@@ -9,14 +9,22 @@ import Date.Extra.Period as Period exposing (Period(..), add)
 import Dict exposing (Dict)
 import Json.Decode exposing (..)
 import Json.Decode.Extra exposing ((|:), withDefault)
-import Set exposing (Set)
 
 
 type AnimState
-    = SlidingLeft
-    | SlidingRight
-    | Steady
+    = Steady
     | Loading
+
+
+type CalendarView
+    = BySite
+    | Combined
+
+
+type ChannelView
+    = Retail
+    | Fulfillment
+    | All
 
 
 type alias Model =
@@ -27,6 +35,8 @@ type alias Model =
     , start : Date
     , end : Date
     , items : List CalendarItem
+    , selectedChannel : ChannelView
+    , calendarView : CalendarView
     }
 
 
@@ -41,12 +51,19 @@ type alias CalendarItem =
     , url : String
     , photo : String
     , mediaUrl : String
+    , allCategories : List String
     }
 
 
 type alias CalendarItemChild =
     { url : String
     , photo : String
+    }
+
+
+type alias Source =
+    { name : String
+    , channel : String
     }
 
 
@@ -58,6 +75,8 @@ type alias Category =
     , backgroundColorDark : String
     , itemColor : String
     , lightItemColor : String
+    , sortname : String
+    , channel : String
     }
 
 
@@ -65,6 +84,13 @@ type alias SearchQuery =
     { query : String
     , starts : String
     , ends : String
+    }
+
+
+type alias UserSettings =
+    { filteredCategories : List String
+    , selectedChannel : String
+    , selectedView : String
     }
 
 
@@ -131,48 +157,129 @@ calendarItemDecoder =
         |: field "url" string
         |: (field "photo" string |> withDefault "")
         |: (field "mediaUrl" string |> withDefault "")
+        |: succeed []
 
 
-categories : List CalendarItem -> List Category
-categories items =
+sourceDecoder : Decoder Source
+sourceDecoder =
+    succeed Source
+        |: field "name" string
+        |: field "channel" string
+
+
+userSettingsDecoder : Decoder UserSettings
+userSettingsDecoder =
+    succeed UserSettings
+        |: field "filteredCategories" (list string |> withDefault [])
+        |: field "selectedChannel" (oneOf [ string, null <| channelViewToString Retail ])
+        |: field "selectedView" (oneOf [ string, null <| calendarViewToString BySite ])
+
+
+calendarViewToString : CalendarView -> String
+calendarViewToString calendarView =
+    case calendarView of
+        BySite ->
+            "by site"
+
+        Combined ->
+            "combined"
+
+
+stringToCalendarView : String -> CalendarView
+stringToCalendarView s =
+    case s of
+        "combined" ->
+            Combined
+
+        _ ->
+            BySite
+
+
+channelViewToString : ChannelView -> String
+channelViewToString channelView =
+    case channelView of
+        Retail ->
+            "retail"
+
+        Fulfillment ->
+            "fulfillment"
+
+        All ->
+            "all"
+
+
+stringToChannelView : String -> ChannelView
+stringToChannelView s =
+    case s of
+        "fulfillment" ->
+            Fulfillment
+
+        "all" ->
+            All
+
+        _ ->
+            Retail
+
+
+categoriesFromSources : List Source -> List Category
+categoriesFromSources sources =
     let
-        categoryColors =
+        defaultCategoryValues =
             Dict.fromList
-                [ ( "meh.com", "green" )
-                , ( "morningsave.com", "cyan" )
-                , ( "checkout.org", "blue-grey" )
-                , ( "casemates.com", "red" )
-                , ( "checkout.laughingsquid.com", "lime" )
+                [ ( "meh.com", { sortname = "000meh.com", hue = "green" } )
+                , ( "morningsave.com", { sortname = "001morningsave.com", hue = "cyan" } )
+                , ( "checkout.org", { sortname = "002checkout.org", hue = "blue-grey" } )
+                , ( "casemates.com", { sortname = "003casemates.com", hue = "red" } )
+                , ( "checkout.laughingsquid.com", { sortname = "004checkout.laughsquid.com", hue = "lime" } )
                 ]
 
         defaultColor =
             "yellow"
     in
-    items
-        |> List.map (\c -> c.category)
-        |> Set.fromList
-        |> Set.toList
+    sources
         |> List.map
-            (\name ->
-                case Dict.get name categoryColors of
-                    Just hue ->
-                        { name = name
+            (\s ->
+                case Dict.get s.name defaultCategoryValues of
+                    Just defaults ->
+                        { name = s.name
                         , selected = True
-                        , hue = hue
-                        , backgroundColor = ColorHelper.hueAndShadeToHex hue "500"
-                        , backgroundColorDark = ColorHelper.hueAndShadeToHex hue "700"
-                        , itemColor = ColorHelper.hueAndShadeToHex hue "300"
-                        , lightItemColor = ColorHelper.hueAndShadeToHex hue "100"
+                        , hue = defaults.hue
+                        , backgroundColor = ColorHelper.hueAndShadeToHex defaults.hue "500"
+                        , backgroundColorDark = ColorHelper.hueAndShadeToHex defaults.hue "700"
+                        , itemColor = ColorHelper.hueAndShadeToHex defaults.hue "300"
+                        , lightItemColor = ColorHelper.hueAndShadeToHex defaults.hue "100"
+                        , sortname = defaults.sortname
+                        , channel = s.channel
                         }
 
                     Nothing ->
-                        { name = name
+                        { name = s.name
                         , selected = True
                         , hue = defaultColor
                         , backgroundColor = ColorHelper.hueAndShadeToHex defaultColor "500"
                         , backgroundColorDark = ColorHelper.hueAndShadeToHex defaultColor "900"
                         , itemColor = ColorHelper.hueAndShadeToHex defaultColor "300"
                         , lightItemColor = ColorHelper.hueAndShadeToHex defaultColor "100"
+                        , sortname = "999" ++ s.name
+                        , channel = s.channel
                         }
             )
-        |> List.sortBy .name
+        |> List.sortBy .sortname
+
+
+combinedCategory : Category
+combinedCategory =
+    let
+        combinedHue =
+            "teal"
+    in
+    { name = "All Events"
+    , selected = True
+    , hue = combinedHue
+    , backgroundColor = ColorHelper.hueAndShadeToHex combinedHue "500"
+    , backgroundColorDark = ColorHelper.hueAndShadeToHex combinedHue "900"
+    , itemColor = ColorHelper.hueAndShadeToHex combinedHue "300"
+    , lightItemColor = ColorHelper.hueAndShadeToHex combinedHue "100"
+    , sortname = "999All Events"
+    , channel = "all"
+    }

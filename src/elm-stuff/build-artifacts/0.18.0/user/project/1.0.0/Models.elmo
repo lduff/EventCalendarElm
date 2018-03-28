@@ -1,21 +1,55 @@
-var _user$project$Models$categories = function (items) {
+var _user$project$Models$combinedCategory = function () {
+	var combinedHue = 'teal';
+	return {
+		name: 'All Events',
+		selected: true,
+		hue: combinedHue,
+		backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, combinedHue, '500'),
+		backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, combinedHue, '900'),
+		itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, combinedHue, '300'),
+		lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, combinedHue, '100'),
+		sortname: '999All Events',
+		channel: 'all'
+	};
+}();
+var _user$project$Models$categoriesFromSources = function (sources) {
 	var defaultColor = 'yellow';
-	var categoryColors = _elm_lang$core$Dict$fromList(
+	var defaultCategoryValues = _elm_lang$core$Dict$fromList(
 		{
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'meh.com', _1: 'green'},
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'meh.com',
+				_1: {sortname: '000meh.com', hue: 'green'}
+			},
 			_1: {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'morningsave.com', _1: 'cyan'},
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'morningsave.com',
+					_1: {sortname: '001morningsave.com', hue: 'cyan'}
+				},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'checkout.org', _1: 'blue-grey'},
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'checkout.org',
+						_1: {sortname: '002checkout.org', hue: 'blue-grey'}
+					},
 					_1: {
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'casemates.com', _1: 'red'},
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'casemates.com',
+							_1: {sortname: '003casemates.com', hue: 'red'}
+						},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'checkout.laughingsquid.com', _1: 'lime'},
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'checkout.laughingsquid.com',
+								_1: {sortname: '004checkout.laughsquid.com', hue: 'lime'}
+							},
 							_1: {ctor: '[]'}
 						}
 					}
@@ -25,43 +59,59 @@ var _user$project$Models$categories = function (items) {
 	return A2(
 		_elm_lang$core$List$sortBy,
 		function (_) {
-			return _.name;
+			return _.sortname;
 		},
 		A2(
 			_elm_lang$core$List$map,
-			function (name) {
-				var _p0 = A2(_elm_lang$core$Dict$get, name, categoryColors);
+			function (s) {
+				var _p0 = A2(_elm_lang$core$Dict$get, s.name, defaultCategoryValues);
 				if (_p0.ctor === 'Just') {
 					var _p1 = _p0._0;
 					return {
-						name: name,
+						name: s.name,
 						selected: true,
-						hue: _p1,
-						backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '500'),
-						backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '700'),
-						itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '300'),
-						lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1, '100')
+						hue: _p1.hue,
+						backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1.hue, '500'),
+						backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1.hue, '700'),
+						itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1.hue, '300'),
+						lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, _p1.hue, '100'),
+						sortname: _p1.sortname,
+						channel: s.channel
 					};
 				} else {
 					return {
-						name: name,
+						name: s.name,
 						selected: true,
 						hue: defaultColor,
 						backgroundColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '500'),
 						backgroundColorDark: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '900'),
 						itemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '300'),
-						lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '100')
+						lightItemColor: A2(_user$project$ColorHelper$hueAndShadeToHex, defaultColor, '100'),
+						sortname: A2(_elm_lang$core$Basics_ops['++'], '999', s.name),
+						channel: s.channel
 					};
 				}
 			},
-			_elm_lang$core$Set$toList(
-				_elm_lang$core$Set$fromList(
-					A2(
-						_elm_lang$core$List$map,
-						function (c) {
-							return c.category;
-						},
-						items)))));
+			sources));
+};
+var _user$project$Models$channelViewToString = function (channelView) {
+	var _p2 = channelView;
+	switch (_p2.ctor) {
+		case 'Retail':
+			return 'retail';
+		case 'Fulfillment':
+			return 'fulfillment';
+		default:
+			return 'all';
+	}
+};
+var _user$project$Models$calendarViewToString = function (calendarView) {
+	var _p3 = calendarView;
+	if (_p3.ctor === 'BySite') {
+		return 'by site';
+	} else {
+		return 'combined';
+	}
 };
 var _user$project$Models$beginningOfWeek = function (date) {
 	return A3(
@@ -114,9 +164,9 @@ var _user$project$Models$duration = A3(
 		}),
 	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
 	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate));
-var _user$project$Models$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {currentDate: a, animState: b, query: c, categories: d, start: e, end: f, items: g};
+var _user$project$Models$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {currentDate: a, animState: b, query: c, categories: d, start: e, end: f, items: g, selectedChannel: h, calendarView: i};
 	});
 var _user$project$Models$CalendarItem = function (a) {
 	return function (b) {
@@ -128,7 +178,9 @@ var _user$project$Models$CalendarItem = function (a) {
 							return function (h) {
 								return function (i) {
 									return function (j) {
-										return {start: a, end: b, text: c, category: d, eventType: e, duration: f, children: g, url: h, photo: i, mediaUrl: j};
+										return function (k) {
+											return {start: a, end: b, text: c, category: d, eventType: e, duration: f, children: g, url: h, photo: i, mediaUrl: j, allCategories: k};
+										};
 									};
 								};
 							};
@@ -168,35 +220,118 @@ var _user$project$Models$calendarItemDecoder = A2(
 									_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 									A2(
 										_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
-										_elm_lang$core$Json_Decode$succeed(_user$project$Models$CalendarItem),
-										A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate)),
-									A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate)),
-								A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string)),
-							A2(_elm_lang$core$Json_Decode$field, 'site', _elm_lang$core$Json_Decode$string)),
-						A2(_elm_lang$core$Json_Decode$field, 'eventType', _elm_lang$core$Json_Decode$string)),
-					_user$project$Models$duration),
-				A2(
-					_elm_lang$core$Json_Decode$field,
-					'children',
-					_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemChildDecoder))),
-			A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string)),
+										A2(
+											_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+											_elm_lang$core$Json_Decode$succeed(_user$project$Models$CalendarItem),
+											A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate)),
+										A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate)),
+									A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string)),
+								A2(_elm_lang$core$Json_Decode$field, 'site', _elm_lang$core$Json_Decode$string)),
+							A2(_elm_lang$core$Json_Decode$field, 'eventType', _elm_lang$core$Json_Decode$string)),
+						_user$project$Models$duration),
+					A2(
+						_elm_lang$core$Json_Decode$field,
+						'children',
+						_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemChildDecoder))),
+				A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string)),
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra$withDefault,
+				'',
+				A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string))),
 		A2(
 			_elm_community$json_extra$Json_Decode_Extra$withDefault,
 			'',
-			A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string))),
+			A2(_elm_lang$core$Json_Decode$field, 'mediaUrl', _elm_lang$core$Json_Decode$string))),
+	_elm_lang$core$Json_Decode$succeed(
+		{ctor: '[]'}));
+var _user$project$Models$Source = F2(
+	function (a, b) {
+		return {name: a, channel: b};
+	});
+var _user$project$Models$sourceDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 	A2(
-		_elm_community$json_extra$Json_Decode_Extra$withDefault,
-		'',
-		A2(_elm_lang$core$Json_Decode$field, 'mediaUrl', _elm_lang$core$Json_Decode$string)));
-var _user$project$Models$Category = F7(
-	function (a, b, c, d, e, f, g) {
-		return {name: a, selected: b, hue: c, backgroundColor: d, backgroundColorDark: e, itemColor: f, lightItemColor: g};
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		_elm_lang$core$Json_Decode$succeed(_user$project$Models$Source),
+		A2(_elm_lang$core$Json_Decode$field, 'name', _elm_lang$core$Json_Decode$string)),
+	A2(_elm_lang$core$Json_Decode$field, 'channel', _elm_lang$core$Json_Decode$string));
+var _user$project$Models$Category = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {name: a, selected: b, hue: c, backgroundColor: d, backgroundColorDark: e, itemColor: f, lightItemColor: g, sortname: h, channel: i};
 	});
 var _user$project$Models$SearchQuery = F3(
 	function (a, b, c) {
 		return {query: a, starts: b, ends: c};
 	});
+var _user$project$Models$UserSettings = F3(
+	function (a, b, c) {
+		return {filteredCategories: a, selectedChannel: b, selectedView: c};
+	});
 var _user$project$Models$Loading = {ctor: 'Loading'};
 var _user$project$Models$Steady = {ctor: 'Steady'};
-var _user$project$Models$SlidingRight = {ctor: 'SlidingRight'};
-var _user$project$Models$SlidingLeft = {ctor: 'SlidingLeft'};
+var _user$project$Models$Combined = {ctor: 'Combined'};
+var _user$project$Models$BySite = {ctor: 'BySite'};
+var _user$project$Models$stringToCalendarView = function (s) {
+	var _p4 = s;
+	if (_p4 === 'combined') {
+		return _user$project$Models$Combined;
+	} else {
+		return _user$project$Models$BySite;
+	}
+};
+var _user$project$Models$All = {ctor: 'All'};
+var _user$project$Models$Fulfillment = {ctor: 'Fulfillment'};
+var _user$project$Models$Retail = {ctor: 'Retail'};
+var _user$project$Models$userSettingsDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+			_elm_lang$core$Json_Decode$succeed(_user$project$Models$UserSettings),
+			A2(
+				_elm_lang$core$Json_Decode$field,
+				'filteredCategories',
+				A2(
+					_elm_community$json_extra$Json_Decode_Extra$withDefault,
+					{ctor: '[]'},
+					_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string)))),
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'selectedChannel',
+			_elm_lang$core$Json_Decode$oneOf(
+				{
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$string,
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$null(
+							_user$project$Models$channelViewToString(_user$project$Models$Retail)),
+						_1: {ctor: '[]'}
+					}
+				}))),
+	A2(
+		_elm_lang$core$Json_Decode$field,
+		'selectedView',
+		_elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: _elm_lang$core$Json_Decode$string,
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Json_Decode$null(
+						_user$project$Models$calendarViewToString(_user$project$Models$BySite)),
+					_1: {ctor: '[]'}
+				}
+			})));
+var _user$project$Models$stringToChannelView = function (s) {
+	var _p5 = s;
+	switch (_p5) {
+		case 'fulfillment':
+			return _user$project$Models$Fulfillment;
+		case 'all':
+			return _user$project$Models$All;
+		default:
+			return _user$project$Models$Retail;
+	}
+};

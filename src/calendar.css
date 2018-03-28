@@ -20,16 +20,6 @@
   transition: all 50ms ease-in 0s;
 }
 
-.slide-left {
-  opacity: 0.8;
-  /*left: -6px;*/
-}
-
-.slide-right {
-  opacity: 0.8;
-  /*left: 6px;*/
-}
-
 .calendar-category-header {
   display: grid;
   padding-left: 1em;
@@ -101,10 +91,6 @@
   padding-left: 0.25em;
   padding-right: 0.25em;
   margin-top: 3px;
-}
-
-.calendar-item-buttons .button {
-  margin-right: 3px;
 }
 
 .calendar-item-icon {

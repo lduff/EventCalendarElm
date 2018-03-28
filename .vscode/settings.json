@@ -1,0 +1,4 @@
+{
+     "elm.makeSpecialFile": "Main.elm",
+    "elm.makeOutput": "../Output/EventCalendar.js"
+}

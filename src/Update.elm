@@ -3,9 +3,21 @@ module Update exposing (update)
 import Date.Extra.Duration exposing (..)
 import Date.Extra.Format as Format
 import Json.Decode exposing (decodeValue, list)
-import Models exposing (AnimState(..), Model, beginningOfWeek, calendarItemDecoder, categories, endOfWeek)
+import Models exposing (AnimState(..), Model, beginningOfWeek, calendarItemDecoder, categoriesFromSources, endOfWeek, sourceDecoder, stringToCalendarView, stringToChannelView)
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
+
+
+saveSettings : Model -> Cmd Msg
+saveSettings model =
+    saveUserSettings <|
+        Models.UserSettings
+            (model.categories
+                |> List.filter (not << .selected)
+                |> List.map .name
+            )
+            (Models.channelViewToString model.selectedChannel)
+            (Models.calendarViewToString model.calendarView)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -55,31 +67,11 @@ update msg model =
                                 else
                                     c
                             )
-            in
-            ( { model | categories = updatedCategories }
-            , storeFilteredCategories
-                (updatedCategories
-                    |> List.filter (not << .selected)
-                    |> List.map .name
-                )
-            )
 
-        RetrieveFilteredCategories ->
-            ( model, retrieveFilteredCategories () )
-
-        FilteredCategories categories ->
-            let
-                updatedCategories =
-                    model.categories
-                        |> List.map
-                            (\c ->
-                                if List.member c.name categories then
-                                    { c | selected = False }
-                                else
-                                    { c | selected = True }
-                            )
+                newModel =
+                    { model | categories = updatedCategories }
             in
-            ( { model | categories = updatedCategories }, Cmd.none )
+            ( newModel, saveSettings model )
 
         Search ->
             ( { model | animState = Loading }
@@ -89,16 +81,24 @@ update msg model =
         SearchResults value ->
             let
                 newItems =
-                    case decodeValue (list calendarItemDecoder) (Debug.log "got here" value) of
+                    case decodeValue (list calendarItemDecoder) value of
                         Ok items ->
-                            items |> List.filter (\i -> not <| String.isEmpty i.mediaUrl)
+                            items
+                                |> List.map
+                                    (\i ->
+                                        { i
+                                            | allCategories =
+                                                items
+                                                    |> List.filter (\i2 -> i2.url == i.url)
+                                                    |> List.map (\i2 -> i2.category)
+                                        }
+                                    )
 
                         Err err ->
                             Debug.log err []
             in
             ( { model
                 | items = newItems
-                , categories = categories newItems
                 , animState = Steady
               }
             , Cmd.none
@@ -106,3 +106,60 @@ update msg model =
 
         ChangeQuery value ->
             ( { model | query = value }, Cmd.none )
+
+        GetSources ->
+            ( { model | animState = Loading }
+            , getSources ()
+            )
+
+        Sources value ->
+            let
+                newCategories =
+                    case decodeValue (list sourceDecoder) value of
+                        Ok sources ->
+                            sources |> categoriesFromSources
+
+                        Err err ->
+                            Debug.log err []
+            in
+            ( { model | categories = newCategories }, getUserSettings () )
+
+        SelectChannel channel ->
+            let
+                newModel =
+                    { model | selectedChannel = channel }
+            in
+            ( newModel, saveSettings newModel )
+
+        SelectCalendarView view ->
+            let
+                newModel =
+                    { model | calendarView = view }
+            in
+            ( newModel, saveSettings newModel )
+
+        UserSettingsResults value ->
+            let
+                userSettings =
+                    case decodeValue Models.userSettingsDecoder value of
+                        Ok settings ->
+                            settings
+
+                        Err err ->
+                            Debug.log err <| Models.UserSettings [] "retail" "by site"
+            in
+            ( { model
+                | calendarView = stringToCalendarView userSettings.selectedView
+                , selectedChannel = stringToChannelView userSettings.selectedChannel
+                , categories =
+                    model.categories
+                        |> List.map
+                            (\c ->
+                                if List.member c.name userSettings.filteredCategories then
+                                    { c | selected = False }
+                                else
+                                    c
+                            )
+              }
+            , Cmd.none
+            )

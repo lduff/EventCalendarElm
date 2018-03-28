@@ -1,19 +1,25 @@
 port module Ports exposing (..)
 
 import Json.Decode exposing (Value)
-import Models exposing (SearchQuery)
+import Models exposing (SearchQuery, UserSettings)
 
 
-port retrieveFilteredCategories : () -> Cmd msg
+port userSettings : (Value -> msg) -> Sub msg
 
 
-port filteredCategories : (List String -> msg) -> Sub msg
+port getUserSettings : () -> Cmd msg
 
 
-port storeFilteredCategories : List String -> Cmd msg
+port saveUserSettings : UserSettings -> Cmd msg
 
 
 port search : SearchQuery -> Cmd msg
 
 
 port searchResults : (Value -> msg) -> Sub msg
+
+
+port getSources : () -> Cmd msg
+
+
+port sources : (Value -> msg) -> Sub msg

@@ -1,3 +1,16 @@
+var _user$project$Msgs$UserSettingsResults = function (a) {
+	return {ctor: 'UserSettingsResults', _0: a};
+};
+var _user$project$Msgs$SelectCalendarView = function (a) {
+	return {ctor: 'SelectCalendarView', _0: a};
+};
+var _user$project$Msgs$SelectChannel = function (a) {
+	return {ctor: 'SelectChannel', _0: a};
+};
+var _user$project$Msgs$Sources = function (a) {
+	return {ctor: 'Sources', _0: a};
+};
+var _user$project$Msgs$GetSources = {ctor: 'GetSources'};
 var _user$project$Msgs$ChangeQuery = function (a) {
 	return {ctor: 'ChangeQuery', _0: a};
 };
@@ -5,10 +18,6 @@ var _user$project$Msgs$SearchResults = function (a) {
 	return {ctor: 'SearchResults', _0: a};
 };
 var _user$project$Msgs$Search = {ctor: 'Search'};
-var _user$project$Msgs$FilteredCategories = function (a) {
-	return {ctor: 'FilteredCategories', _0: a};
-};
-var _user$project$Msgs$RetrieveFilteredCategories = {ctor: 'RetrieveFilteredCategories'};
 var _user$project$Msgs$ToggleCategory = function (a) {
 	return {ctor: 'ToggleCategory', _0: a};
 };

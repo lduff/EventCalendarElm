@@ -1,16 +1,36 @@
+var _user$project$Update$saveSettings = function (model) {
+	return _user$project$Ports$saveUserSettings(
+		A3(
+			_user$project$Models$UserSettings,
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.name;
+				},
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p0) {
+						return !function (_) {
+							return _.selected;
+						}(_p0);
+					},
+					model.categories)),
+			_user$project$Models$channelViewToString(model.selectedChannel),
+			_user$project$Models$calendarViewToString(model.calendarView)));
+};
 var _user$project$Update$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'SetDate':
-				var _p1 = _p0._0;
-				var newEnd = _user$project$Models$endOfWeek(_p1);
-				var newStart = _user$project$Models$beginningOfWeek(_p1);
+				var _p2 = _p1._0;
+				var newEnd = _user$project$Models$endOfWeek(_p2);
+				var newStart = _user$project$Models$beginningOfWeek(_p2);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{currentDate: _p1, start: newStart, end: newEnd}),
+						{currentDate: _p2, start: newStart, end: newEnd}),
 					_1: _user$project$Ports$search(
 						A3(
 							_user$project$Models$SearchQuery,
@@ -19,9 +39,9 @@ var _user$project$Update$update = F2(
 							_rluiten$elm_date_extra$Date_Extra_Format$isoString(newEnd)))
 				};
 			case 'AdjustCalendar':
-				var _p2 = _p0._0;
-				var newEnd = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p2, model.end);
-				var newStart = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p2, model.start);
+				var _p3 = _p1._0;
+				var newEnd = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p3, model.end);
+				var newStart = A3(_rluiten$elm_date_extra$Date_Extra_Duration$add, _rluiten$elm_date_extra$Date_Extra_Duration$Day, _p3, model.start);
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -43,55 +63,18 @@ var _user$project$Update$update = F2(
 				var updatedCategories = A2(
 					_elm_lang$core$List$map,
 					function (c) {
-						return _elm_lang$core$Native_Utils.eq(c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
+						return _elm_lang$core$Native_Utils.eq(c.name, _p1._0) ? _elm_lang$core$Native_Utils.update(
 							c,
 							{selected: !c.selected}) : c;
 					},
 					model.categories);
+				var newModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{categories: updatedCategories});
 				return {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{categories: updatedCategories}),
-					_1: _user$project$Ports$storeFilteredCategories(
-						A2(
-							_elm_lang$core$List$map,
-							function (_) {
-								return _.name;
-							},
-							A2(
-								_elm_lang$core$List$filter,
-								function (_p3) {
-									return !function (_) {
-										return _.selected;
-									}(_p3);
-								},
-								updatedCategories)))
-				};
-			case 'RetrieveFilteredCategories':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Ports$retrieveFilteredCategories(
-						{ctor: '_Tuple0'})
-				};
-			case 'FilteredCategories':
-				var updatedCategories = A2(
-					_elm_lang$core$List$map,
-					function (c) {
-						return A2(_elm_lang$core$List$member, c.name, _p0._0) ? _elm_lang$core$Native_Utils.update(
-							c,
-							{selected: false}) : _elm_lang$core$Native_Utils.update(
-							c,
-							{selected: true});
-					},
-					model.categories);
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{categories: updatedCategories}),
-					_1: _elm_lang$core$Platform_Cmd$none
+					_0: newModel,
+					_1: _user$project$Update$saveSettings(model)
 				};
 			case 'Search':
 				return {
@@ -111,14 +94,29 @@ var _user$project$Update$update = F2(
 					var _p4 = A2(
 						_elm_lang$core$Json_Decode$decodeValue,
 						_elm_lang$core$Json_Decode$list(_user$project$Models$calendarItemDecoder),
-						A2(_elm_lang$core$Debug$log, 'got here', _p0._0));
+						_p1._0);
 					if (_p4.ctor === 'Ok') {
+						var _p5 = _p4._0;
 						return A2(
-							_elm_lang$core$List$filter,
+							_elm_lang$core$List$map,
 							function (i) {
-								return !_elm_lang$core$String$isEmpty(i.mediaUrl);
+								return _elm_lang$core$Native_Utils.update(
+									i,
+									{
+										allCategories: A2(
+											_elm_lang$core$List$map,
+											function (i2) {
+												return i2.category;
+											},
+											A2(
+												_elm_lang$core$List$filter,
+												function (i2) {
+													return _elm_lang$core$Native_Utils.eq(i2.url, i.url);
+												},
+												_p5))
+									});
 							},
-							_p4._0);
+							_p5);
 					} else {
 						return A2(
 							_elm_lang$core$Debug$log,
@@ -130,19 +128,99 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							items: newItems,
-							categories: _user$project$Models$categories(newItems),
-							animState: _user$project$Models$Steady
-						}),
+						{items: newItems, animState: _user$project$Models$Steady}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'ChangeQuery':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{query: _p0._0}),
+						{query: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'GetSources':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{animState: _user$project$Models$Loading}),
+					_1: _user$project$Ports$getSources(
+						{ctor: '_Tuple0'})
+				};
+			case 'Sources':
+				var newCategories = function () {
+					var _p6 = A2(
+						_elm_lang$core$Json_Decode$decodeValue,
+						_elm_lang$core$Json_Decode$list(_user$project$Models$sourceDecoder),
+						_p1._0);
+					if (_p6.ctor === 'Ok') {
+						return _user$project$Models$categoriesFromSources(_p6._0);
+					} else {
+						return A2(
+							_elm_lang$core$Debug$log,
+							_p6._0,
+							{ctor: '[]'});
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{categories: newCategories}),
+					_1: _user$project$Ports$getUserSettings(
+						{ctor: '_Tuple0'})
+				};
+			case 'SelectChannel':
+				var newModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{selectedChannel: _p1._0});
+				return {
+					ctor: '_Tuple2',
+					_0: newModel,
+					_1: _user$project$Update$saveSettings(newModel)
+				};
+			case 'SelectCalendarView':
+				var newModel = _elm_lang$core$Native_Utils.update(
+					model,
+					{calendarView: _p1._0});
+				return {
+					ctor: '_Tuple2',
+					_0: newModel,
+					_1: _user$project$Update$saveSettings(newModel)
+				};
+			default:
+				var userSettings = function () {
+					var _p7 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Models$userSettingsDecoder, _p1._0);
+					if (_p7.ctor === 'Ok') {
+						return _p7._0;
+					} else {
+						return A2(
+							_elm_lang$core$Debug$log,
+							_p7._0,
+							A3(
+								_user$project$Models$UserSettings,
+								{ctor: '[]'},
+								'retail',
+								'by site'));
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							calendarView: _user$project$Models$stringToCalendarView(userSettings.selectedView),
+							selectedChannel: _user$project$Models$stringToChannelView(userSettings.selectedChannel),
+							categories: A2(
+								_elm_lang$core$List$map,
+								function (c) {
+									return A2(_elm_lang$core$List$member, c.name, userSettings.filteredCategories) ? _elm_lang$core$Native_Utils.update(
+										c,
+										{selected: false}) : c;
+								},
+								model.categories)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}

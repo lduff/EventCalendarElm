@@ -1,18 +1,20 @@
-var _user$project$Ports$retrieveFilteredCategories = _elm_lang$core$Native_Platform.outgoingPort(
-	'retrieveFilteredCategories',
+var _user$project$Ports$userSettings = _elm_lang$core$Native_Platform.incomingPort('userSettings', _elm_lang$core$Json_Decode$value);
+var _user$project$Ports$getUserSettings = _elm_lang$core$Native_Platform.outgoingPort(
+	'getUserSettings',
 	function (v) {
 		return null;
 	});
-var _user$project$Ports$filteredCategories = _elm_lang$core$Native_Platform.incomingPort(
-	'filteredCategories',
-	_elm_lang$core$Json_Decode$list(_elm_lang$core$Json_Decode$string));
-var _user$project$Ports$storeFilteredCategories = _elm_lang$core$Native_Platform.outgoingPort(
-	'storeFilteredCategories',
+var _user$project$Ports$saveUserSettings = _elm_lang$core$Native_Platform.outgoingPort(
+	'saveUserSettings',
 	function (v) {
-		return _elm_lang$core$Native_List.toArray(v).map(
-			function (v) {
-				return v;
-			});
+		return {
+			filteredCategories: _elm_lang$core$Native_List.toArray(v.filteredCategories).map(
+				function (v) {
+					return v;
+				}),
+			selectedChannel: v.selectedChannel,
+			selectedView: v.selectedView
+		};
 	});
 var _user$project$Ports$search = _elm_lang$core$Native_Platform.outgoingPort(
 	'search',
@@ -20,3 +22,9 @@ var _user$project$Ports$search = _elm_lang$core$Native_Platform.outgoingPort(
 		return {query: v.query, starts: v.starts, ends: v.ends};
 	});
 var _user$project$Ports$searchResults = _elm_lang$core$Native_Platform.incomingPort('searchResults', _elm_lang$core$Json_Decode$value);
+var _user$project$Ports$getSources = _elm_lang$core$Native_Platform.outgoingPort(
+	'getSources',
+	function (v) {
+		return null;
+	});
+var _user$project$Ports$sources = _elm_lang$core$Native_Platform.incomingPort('sources', _elm_lang$core$Json_Decode$value);
