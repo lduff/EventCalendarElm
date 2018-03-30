@@ -1,6 +1,0 @@
-var _user$project$Repl$t_s_o_l = {ctor: '_Tuple0'};
-var _user$project$Repl$d_e_l_t_r_o_n_3_0_3_0 = A2(
-	_rluiten$elm_date_extra$Date_Extra_Field$fieldToDateClamp,
-	_rluiten$elm_date_extra$Date_Extra_Field$DayOfWeek(
-		{ctor: '_Tuple2', _0: _elm_lang$core$Date$Sun, _1: _elm_lang$core$Date$Sun}),
-	_rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('2018-03-21'));

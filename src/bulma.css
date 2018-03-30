@@ -136,8 +136,9 @@ body,
 button,
 input,
 select,
+td,
 textarea {
-  font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif !important;
 }
 
 code,
@@ -148,7 +149,7 @@ pre {
 }
 
 body {
-  color: #4a4a4a;
+  color: #4a4a4a !important;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -1350,6 +1351,8 @@ a.box:active {
   padding-right: 0.75em;
   text-align: center;
   white-space: nowrap;
+  background-image: none;
+  font-weight: inherit !important;
 }
 
 .button:focus, .button.is-focused, .button:active, .button.is-active {

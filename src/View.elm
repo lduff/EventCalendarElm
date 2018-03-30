@@ -11,18 +11,31 @@ import Msgs exposing (Msg(..))
 
 view : Model -> Html Msg
 view model =
-    section [ class "section" ]
-        [ div
-            [ id "outer"
-            , class "container"
-            ]
-            [ viewHeader model
-            , case model.animState of
-                Loading ->
-                    loading model
+    div
+        [ id "outer"
+        , class "container"
+        ]
+        [ viewNavbar model
+        , viewHeader model
+        , case model.animState of
+            Loading ->
+                loading model
 
-                _ ->
-                    calendar model
+            _ ->
+                calendar model
+        ]
+
+
+viewNavbar : Model -> Html Msg
+viewNavbar model =
+    nav [ class "navbar", attribute "role" "navigation", style [ ( "margin-bottom", "8px" ) ] ]
+        [ div [ class "navbar-brand" ]
+            [ a [ class "navbar-item", href "https://mediocre.my.salesforce.com" ]
+                [ img [ src "https://s3.amazonaws.com/mediocre-static/logo.png", alt "Mediocre", height 28 ] [] ]
+            ]
+        , div [ class "navbar-menu" ]
+            [ a [ class "navbar-item", href "https://mediocre.my.salesforce.com" ]
+                [ text "Back to Salesforce" ]
             ]
         ]
 

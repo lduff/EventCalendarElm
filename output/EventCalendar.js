@@ -19598,13 +19598,26 @@ var _user$project$View$viewHeader = function (model) {
 			}
 		});
 };
-var _user$project$View$view = function (model) {
+var _user$project$View$viewNavbar = function (model) {
 	return A2(
-		_elm_lang$html$Html$section,
+		_elm_lang$html$Html$nav,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('section'),
-			_1: {ctor: '[]'}
+			_0: _elm_lang$html$Html_Attributes$class('navbar'),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'navigation'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '8px'},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
+			}
 		},
 		{
 			ctor: '::',
@@ -19612,30 +19625,108 @@ var _user$project$View$view = function (model) {
 				_elm_lang$html$Html$div,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$id('outer'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('container'),
-						_1: {ctor: '[]'}
-					}
+					_0: _elm_lang$html$Html_Attributes$class('navbar-brand'),
+					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: _user$project$View$viewHeader(model),
-					_1: {
-						ctor: '::',
-						_0: function () {
-							var _p0 = model.animState;
-							if (_p0.ctor === 'Loading') {
-								return _user$project$View$loading(model);
-							} else {
-								return _user$project$Calendar$calendar(model);
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('navbar-item'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$href('https://mediocre.my.salesforce.com'),
+								_1: {ctor: '[]'}
 							}
-						}(),
-						_1: {ctor: '[]'}
-					}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$img,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$src('https://s3.amazonaws.com/mediocre-static/logo.png'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$alt('Mediocre'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$height(28),
+											_1: {ctor: '[]'}
+										}
+									}
+								},
+								{ctor: '[]'}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
 				}),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('navbar-menu'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$a,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('navbar-item'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$href('https://mediocre.my.salesforce.com'),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Back to Salesforce'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$View$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$id('outer'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('container'),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _user$project$View$viewNavbar(model),
+			_1: {
+				ctor: '::',
+				_0: _user$project$View$viewHeader(model),
+				_1: {
+					ctor: '::',
+					_0: function () {
+						var _p0 = model.animState;
+						if (_p0.ctor === 'Loading') {
+							return _user$project$View$loading(model);
+						} else {
+							return _user$project$Calendar$calendar(model);
+						}
+					}(),
+					_1: {ctor: '[]'}
+				}
+			}
 		});
 };
 
@@ -19686,7 +19777,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"message":"Msgs.Msg","aliases":{"Json.Decode.Value":{"type":"Json.Encode.Value","args":[]}},"unions":{"Models.ChannelView":{"tags":{"Retail":[],"Fulfillment":[],"All":[]},"args":[]},"Msgs.Msg":{"tags":{"SelectCalendarView":["Models.CalendarView"],"AdjustCalendar":["Int"],"SelectChannel":["Models.ChannelView"],"Search":[],"UserSettingsResults":["Json.Decode.Value"],"SearchResults":["Json.Decode.Value"],"ChangeQuery":["String"],"ToggleCategory":["String"],"GetSources":[],"SetDate":["Date.Date"],"Sources":["Json.Decode.Value"]},"args":[]},"Json.Encode.Value":{"tags":{"Value":[]},"args":[]},"Models.CalendarView":{"tags":{"Combined":[],"BySite":[]},"args":[]},"Date.Date":{"tags":{"Date":[]},"args":[]}}},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Json.Encode.Value":{"args":[],"tags":{"Value":[]}},"Models.CalendarView":{"args":[],"tags":{"Combined":[],"BySite":[]}},"Date.Date":{"args":[],"tags":{"Date":[]}},"Models.ChannelView":{"args":[],"tags":{"All":[],"Retail":[],"Fulfillment":[]}},"Msgs.Msg":{"args":[],"tags":{"ChangeQuery":["String"],"SearchResults":["Json.Decode.Value"],"ToggleCategory":["String"],"GetSources":[],"Sources":["Json.Decode.Value"],"SetDate":["Date.Date"],"SelectCalendarView":["Models.CalendarView"],"AdjustCalendar":["Int"],"SelectChannel":["Models.ChannelView"],"Search":[],"UserSettingsResults":["Json.Decode.Value"]}}},"aliases":{"Json.Decode.Value":{"args":[],"type":"Json.Encode.Value"}},"message":"Msgs.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])
