@@ -14999,6 +14999,10 @@ return {
 
 }();
 
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
 var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
 var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
 var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
@@ -17794,6 +17798,19 @@ var _user$project$Models$calendarViewToString = function (calendarView) {
 		return 'combined';
 	}
 };
+var _user$project$Models$iso8601ToDateTime = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	function (epochms) {
+		var dateAndTime = _elm_lang$core$Date$fromTime(
+			_elm_lang$core$Basics$toFloat(epochms));
+		var tzAdjusted = A3(
+			_rluiten$elm_date_extra$Date_Extra_Period$add,
+			_rluiten$elm_date_extra$Date_Extra_Period$Hour,
+			(_rluiten$elm_date_extra$Date_Extra_Create$getTimezoneOffset(dateAndTime) / 60) | 0,
+			dateAndTime);
+		return _elm_lang$core$Json_Decode$succeed(dateAndTime);
+	},
+	_elm_lang$core$Json_Decode$int);
 var _user$project$Models$beginningOfWeek = function (date) {
 	return A3(
 		_rluiten$elm_date_extra$Date_Extra_Duration$add,
@@ -17845,10 +17862,29 @@ var _user$project$Models$duration = A3(
 		}),
 	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
 	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate));
-var _user$project$Models$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {currentDate: a, animState: b, query: c, categories: d, start: e, end: f, items: g, selectedChannel: h, calendarView: i};
-	});
+var _user$project$Models$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {currentDate: a, pageState: b, query: c, categories: d, start: e, end: f, items: g, selectedChannel: h, calendarView: i, hoverIntent: j, detailItem: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var _user$project$Models$CalendarItem = function (a) {
 	return function (b) {
 		return function (c) {
@@ -17872,15 +17908,26 @@ var _user$project$Models$CalendarItem = function (a) {
 		};
 	};
 };
-var _user$project$Models$CalendarItemChild = F2(
-	function (a, b) {
-		return {url: a, photo: b};
+var _user$project$Models$CalendarItemChild = F5(
+	function (a, b, c, d, e) {
+		return {url: a, photo: b, text: c, start: d, end: e};
 	});
-var _user$project$Models$calendarItemChildDecoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_user$project$Models$CalendarItemChild,
-	A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string));
+var _user$project$Models$calendarItemChildDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+				A2(
+					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+					_elm_lang$core$Json_Decode$succeed(_user$project$Models$CalendarItemChild),
+					A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string)),
+			A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string)),
+		A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDateTime)),
+	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDateTime));
 var _user$project$Models$calendarItemDecoder = A2(
 	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 	A2(
@@ -17949,7 +17996,8 @@ var _user$project$Models$UserSettings = F3(
 		return {filteredCategories: a, selectedChannel: b, selectedView: c};
 	});
 var _user$project$Models$Loading = {ctor: 'Loading'};
-var _user$project$Models$Steady = {ctor: 'Steady'};
+var _user$project$Models$Detail = {ctor: 'Detail'};
+var _user$project$Models$Calendar = {ctor: 'Calendar'};
 var _user$project$Models$Combined = {ctor: 'Combined'};
 var _user$project$Models$BySite = {ctor: 'BySite'};
 var _user$project$Models$stringToCalendarView = function (s) {
@@ -18016,7 +18064,23 @@ var _user$project$Models$stringToChannelView = function (s) {
 			return _user$project$Models$Retail;
 	}
 };
+var _user$project$Models$None = {ctor: 'None'};
+var _user$project$Models$Hover = function (a) {
+	return {ctor: 'Hover', _0: a};
+};
+var _user$project$Models$Intent = function (a) {
+	return {ctor: 'Intent', _0: a};
+};
 
+var _user$project$Msgs$NavigateCalendar = {ctor: 'NavigateCalendar'};
+var _user$project$Msgs$NavigateDetail = function (a) {
+	return {ctor: 'NavigateDetail', _0: a};
+};
+var _user$project$Msgs$CancelHover = {ctor: 'CancelHover'};
+var _user$project$Msgs$StartHover = {ctor: 'StartHover'};
+var _user$project$Msgs$StartHoverIntent = function (a) {
+	return {ctor: 'StartHoverIntent', _0: a};
+};
 var _user$project$Msgs$UserSettingsResults = function (a) {
 	return {ctor: 'UserSettingsResults', _0: a};
 };
@@ -18105,36 +18169,51 @@ var _user$project$Calendar$tagsForCategories = F2(
 	});
 var _user$project$Calendar$calendarItem = F3(
 	function (model, category, item) {
-		var _p3 = function () {
-			var _p4 = model.calendarView;
-			if (_p4.ctor === 'BySite') {
+		var isHoverItem = function () {
+			var _p3 = model.hoverIntent;
+			switch (_p3.ctor) {
+				case 'Hover':
+					return _elm_lang$core$Native_Utils.eq(
+						A2(_elm_lang$core$Basics_ops['++'], category.name, item.url),
+						_p3._0);
+				case 'Intent':
+					return false;
+				default:
+					return false;
+			}
+		}();
+		var _p4 = function () {
+			var _p5 = model.calendarView;
+			if (_p5.ctor === 'BySite') {
 				return {ctor: '_Tuple2', _0: category.itemColor, _1: category.backgroundColor};
 			} else {
-				var _p5 = A2(
+				var _p6 = A2(
 					_elm_community$list_extra$List_Extra$find,
 					function (c) {
 						return _elm_lang$core$Native_Utils.eq(c.name, item.category);
 					},
 					model.categories);
-				if (_p5.ctor === 'Just') {
-					var _p6 = _p5._0;
-					return {ctor: '_Tuple2', _0: _p6.itemColor, _1: _p6.backgroundColor};
+				if (_p6.ctor === 'Just') {
+					var _p7 = _p6._0;
+					return {ctor: '_Tuple2', _0: _p7.itemColor, _1: _p7.backgroundColor};
 				} else {
 					return {ctor: '_Tuple2', _0: category.itemColor, _1: category.backgroundColor};
 				}
 			}
 		}();
-		var itemColor = _p3._0;
-		var backgroundColor = _p3._1;
+		var itemColor = _p4._0;
+		var backgroundColor = _p4._1;
 		var iconClass = function () {
-			var _p7 = item.eventType;
-			switch (_p7) {
+			var _p8 = item.eventType;
+			switch (_p8) {
 				case 'catalog':
 					return 'fas fa-dollar-sign';
 				case 'poll':
 					return 'fas fa-chart-bar';
 				case 'video':
 					return 'fas fa-video';
+				case 'mehrathon':
+					return 'fas fa-meh';
 				default:
 					return '';
 			}
@@ -18150,9 +18229,9 @@ var _user$project$Calendar$calendarItem = F3(
 			_user$project$Models$removeTime(item.start),
 			_user$project$Models$removeTime(model.start));
 		var startEndText = function () {
-			var _p8 = {ctor: '_Tuple2', _0: continuesFromPrev, _1: continuesToNext};
-			if (_p8._0 === true) {
-				if (_p8._1 === true) {
+			var _p9 = {ctor: '_Tuple2', _0: continuesFromPrev, _1: continuesToNext};
+			if (_p9._0 === true) {
+				if (_p9._1 === true) {
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '« %B %e', item.start),
@@ -18171,7 +18250,7 @@ var _user$project$Calendar$calendarItem = F3(
 						A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%B %e', item.start));
 				}
 			} else {
-				if (_p8._1 === true) {
+				if (_p9._1 === true) {
 					return A2(
 						_elm_lang$core$Basics_ops['++'],
 						'through ',
@@ -18204,7 +18283,10 @@ var _user$project$Calendar$calendarItem = F3(
 						A2(
 							_elm_lang$core$Basics_ops['++'],
 							continuesFromPrev ? ' calendar-item-continues-from-prev' : '',
-							continuesToNext ? ' calendar-item-continues-to-next' : ''))),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								continuesToNext ? ' calendar-item-continues-to-next' : '',
+								isHoverItem ? ' calendar-item-hover' : '')))),
 				_1: {
 					ctor: '::',
 					_0: _elm_lang$html$Html_Attributes$style(
@@ -18233,7 +18315,17 @@ var _user$project$Calendar$calendarItem = F3(
 								}
 							}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onMouseEnter(
+							_user$project$Msgs$StartHoverIntent(
+								A2(_elm_lang$core$Basics_ops['++'], category.name, item.url))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onMouseLeave(_user$project$Msgs$CancelHover),
+							_1: {ctor: '[]'}
+						}
+					}
 				}
 			},
 			{
@@ -18348,7 +18440,31 @@ var _user$project$Calendar$calendarItem = F3(
 															_0: _elm_lang$html$Html$text('Edit'),
 															_1: {ctor: '[]'}
 														}),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$a,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$href('#'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('button is-small'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(
+																			_user$project$Msgs$NavigateDetail(item)),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Details'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
 												}
 											}),
 										_1: {ctor: '[]'}
@@ -18676,7 +18792,7 @@ var _user$project$Calendar$calendarHeader = function (model) {
 								_elm_lang$html$Html$i,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$class('fas fa-fast-backward'),
+									_0: _elm_lang$html$Html_Attributes$class('fas fa-angle-double-left'),
 									_1: {ctor: '[]'}
 								},
 								{ctor: '[]'}),
@@ -18731,7 +18847,7 @@ var _user$project$Calendar$calendarHeader = function (model) {
 										_elm_lang$html$Html$i,
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('fas fa-fast-forward'),
+											_0: _elm_lang$html$Html_Attributes$class('fas fa-angle-double-right'),
 											_1: {ctor: '[]'}
 										},
 										{ctor: '[]'}),
@@ -18764,17 +18880,17 @@ var _user$project$Calendar$calendar = function (model) {
 			_1: {ctor: '[]'}
 		},
 		function () {
-			var _p9 = model.calendarView;
-			if (_p9.ctor === 'BySite') {
+			var _p10 = model.calendarView;
+			if (_p10.ctor === 'BySite') {
 				return {
 					ctor: '::',
 					_0: _user$project$Calendar$calendarHeader(model),
 					_1: A2(
 						_elm_lang$core$List$map,
 						function (c) {
-							var _p10 = A2(_elm_lang$core$Dict$get, c.name, calendarItemsDict);
-							if (_p10.ctor === 'Just') {
-								return A3(_user$project$Calendar$category, model, c, _p10._0);
+							var _p11 = A2(_elm_lang$core$Dict$get, c.name, calendarItemsDict);
+							if (_p11.ctor === 'Just') {
+								return A3(_user$project$Calendar$category, model, c, _p11._0);
 							} else {
 								return _elm_lang$html$Html$text('');
 							}
@@ -18804,22 +18920,22 @@ var _user$project$Calendar$calendar = function (model) {
 								A2(
 									_elm_lang$core$List$filter,
 									function (i) {
-										var _p11 = function () {
-											var _p12 = A2(
+										var _p12 = function () {
+											var _p13 = A2(
 												_elm_community$list_extra$List_Extra$find,
 												function (c) {
 													return _elm_lang$core$Native_Utils.eq(c.name, i.category);
 												},
 												model.categories);
-											if (_p12.ctor === 'Just') {
-												var _p13 = _p12._0;
-												return {ctor: '_Tuple2', _0: _p13.channel, _1: _p13.selected};
+											if (_p13.ctor === 'Just') {
+												var _p14 = _p13._0;
+												return {ctor: '_Tuple2', _0: _p14.channel, _1: _p14.selected};
 											} else {
 												return {ctor: '_Tuple2', _0: 'all', _1: true};
 											}
 										}();
-										var channel = _p11._0;
-										var selected = _p11._1;
+										var channel = _p12._0;
+										var selected = _p12._1;
 										return _elm_lang$core$Native_Utils.eq(model.selectedChannel, _user$project$Models$All) || ((_elm_lang$core$Native_Utils.eq(channel, 'retail') && (_elm_lang$core$Native_Utils.eq(model.selectedChannel, _user$project$Models$Retail) && selected)) || (_elm_lang$core$Native_Utils.eq(channel, 'fulfillment') && (_elm_lang$core$Native_Utils.eq(model.selectedChannel, _user$project$Models$Fulfillment) && selected)));
 									},
 									model.items))),
@@ -18887,8 +19003,10 @@ var _user$project$Update$update = F2(
 		switch (_p1.ctor) {
 			case 'SetDate':
 				var _p2 = _p1._0;
-				var newEnd = _user$project$Models$endOfWeek(_p2);
-				var newStart = _user$project$Models$beginningOfWeek(_p2);
+				var newEnd = _user$project$Models$removeTime(
+					_user$project$Models$endOfWeek(_p2));
+				var newStart = _user$project$Models$removeTime(
+					_user$project$Models$beginningOfWeek(_p2));
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -18913,7 +19031,7 @@ var _user$project$Update$update = F2(
 							start: newStart,
 							end: newEnd,
 							items: {ctor: '[]'},
-							animState: _user$project$Models$Loading
+							pageState: _user$project$Models$Loading
 						}),
 					_1: _user$project$Ports$search(
 						A3(
@@ -18944,7 +19062,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{animState: _user$project$Models$Loading}),
+						{pageState: _user$project$Models$Loading}),
 					_1: _user$project$Ports$search(
 						A3(
 							_user$project$Models$SearchQuery,
@@ -18991,7 +19109,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{items: newItems, animState: _user$project$Models$Steady}),
+						{items: newItems, pageState: _user$project$Models$Calendar}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeQuery':
@@ -19007,7 +19125,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{animState: _user$project$Models$Loading}),
+						{pageState: _user$project$Models$Loading}),
 					_1: _user$project$Ports$getSources(
 						{ctor: '_Tuple0'})
 				};
@@ -19052,7 +19170,7 @@ var _user$project$Update$update = F2(
 					_0: newModel,
 					_1: _user$project$Update$saveSettings(newModel)
 				};
-			default:
+			case 'UserSettingsResults':
 				var userSettings = function () {
 					var _p7 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Models$userSettingsDecoder, _p1._0);
 					if (_p7.ctor === 'Ok') {
@@ -19086,9 +19204,328 @@ var _user$project$Update$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'StartHoverIntent':
+				var delayHoverCmd = A2(
+					_elm_lang$core$Task$perform,
+					function (_p8) {
+						return _user$project$Msgs$StartHover;
+					},
+					_elm_lang$core$Process$sleep(200 * _elm_lang$core$Time$millisecond));
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							hoverIntent: _user$project$Models$Intent(_p1._0)
+						}),
+					_1: delayHoverCmd
+				};
+			case 'StartHover':
+				var newHoverIntent = function () {
+					var _p9 = model.hoverIntent;
+					switch (_p9.ctor) {
+						case 'Intent':
+							return _user$project$Models$Hover(_p9._0);
+						case 'Hover':
+							return _user$project$Models$Hover(_p9._0);
+						default:
+							return _user$project$Models$None;
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{hoverIntent: newHoverIntent}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'CancelHover':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{hoverIntent: _user$project$Models$None}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'NavigateDetail':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _user$project$Models$Detail,
+							detailItem: _elm_lang$core$Maybe$Just(_p1._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{pageState: _user$project$Models$Calendar, detailItem: _elm_lang$core$Maybe$Nothing}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 
+var _user$project$View$detailItem = F2(
+	function (model, item) {
+		var children = A2(
+			_elm_lang$core$List$sortBy,
+			function (c) {
+				return _rluiten$elm_date_extra$Date_Extra_Format$isoString(c.start);
+			},
+			item.children);
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$span,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('title'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(item.text),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$table,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('table'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$thead,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$th,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$th,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$th,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('starts'),
+													_1: {ctor: '[]'}
+												}),
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$th,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('ends'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$th,
+														{ctor: '[]'},
+														{ctor: '[]'}),
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$tbody,
+									{ctor: '[]'},
+									A2(
+										_elm_lang$core$List$map,
+										function (i) {
+											return A2(
+												_elm_lang$html$Html$tr,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$td,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$img,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$src(i.photo),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$style(
+																			{
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: 'height', _1: '20px'},
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}
+																},
+																{ctor: '[]'}),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$td,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text(i.text),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$td,
+																{ctor: '[]'},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text(
+																		A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%-I:%M %P', i.start)),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$td,
+																	{ctor: '[]'},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text(
+																			A3(_rluiten$elm_date_extra$Date_Extra_Format$format, _rluiten$elm_date_extra$Date_Extra_Config_Config_en_us$config, '%-I:%M %P', i.end)),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$td,
+																		{ctor: '[]'},
+																		{
+																			ctor: '::',
+																			_0: A2(
+																				_elm_lang$html$Html$a,
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$href(i.url),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$class('button is-link is-small'),
+																						_1: {ctor: '[]'}
+																					}
+																				},
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html$text('Edit'),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												});
+										},
+										children)),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$View$detailHeader = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('navbar-menu'),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('navbar-item'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$href('#'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Msgs$NavigateCalendar),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Back to Calendar'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$View$detail = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('detail'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: _user$project$View$detailHeader(model),
+			_1: {
+				ctor: '::',
+				_0: function () {
+					var _p0 = model.detailItem;
+					if (_p0.ctor === 'Just') {
+						return A2(_user$project$View$detailItem, model, _p0._0);
+					} else {
+						return _elm_lang$html$Html$text('');
+					}
+				}(),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$View$viewDropdown = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -19420,7 +19857,16 @@ var _user$project$View$viewHeader = function (model) {
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$class('level'),
-			_1: {ctor: '[]'}
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '8px'},
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
 		},
 		{
 			ctor: '::',
@@ -19675,19 +20121,30 @@ var _user$project$View$viewNavbar = function (model) {
 					{
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$a,
+							_elm_lang$html$Html$div,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('navbar-item'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$href('https://mediocre.my.salesforce.com'),
-									_1: {ctor: '[]'}
-								}
+								_0: _elm_lang$html$Html_Attributes$class('navbar-start'),
+								_1: {ctor: '[]'}
 							},
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html$text('Back to Salesforce'),
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('navbar-item'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href('https://mediocre.my.salesforce.com'),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Back to Salesforce'),
+										_1: {ctor: '[]'}
+									}),
 								_1: {ctor: '[]'}
 							}),
 						_1: {ctor: '[]'}
@@ -19708,26 +20165,33 @@ var _user$project$View$view = function (model) {
 				_1: {ctor: '[]'}
 			}
 		},
-		{
-			ctor: '::',
-			_0: _user$project$View$viewNavbar(model),
-			_1: {
-				ctor: '::',
-				_0: _user$project$View$viewHeader(model),
-				_1: {
-					ctor: '::',
-					_0: function () {
-						var _p0 = model.animState;
-						if (_p0.ctor === 'Loading') {
-							return _user$project$View$loading(model);
-						} else {
-							return _user$project$Calendar$calendar(model);
+		function () {
+			var _p1 = model.pageState;
+			switch (_p1.ctor) {
+				case 'Loading':
+					return {
+						ctor: '::',
+						_0: _user$project$View$loading(model),
+						_1: {ctor: '[]'}
+					};
+				case 'Calendar':
+					return {
+						ctor: '::',
+						_0: _user$project$View$viewHeader(model),
+						_1: {
+							ctor: '::',
+							_0: _user$project$Calendar$calendar(model),
+							_1: {ctor: '[]'}
 						}
-					}(),
-					_1: {ctor: '[]'}
-				}
+					};
+				default:
+					return {
+						ctor: '::',
+						_0: _user$project$View$detail(model),
+						_1: {ctor: '[]'}
+					};
 			}
-		});
+		}());
 };
 
 var _user$project$Main$subscriptions = function (model) {
@@ -19755,9 +20219,11 @@ var _user$project$Main$init = {
 		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
 		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
 		query: '',
-		animState: _user$project$Models$Loading,
+		pageState: _user$project$Models$Loading,
 		selectedChannel: _user$project$Models$Retail,
-		calendarView: _user$project$Models$BySite
+		calendarView: _user$project$Models$BySite,
+		hoverIntent: _user$project$Models$None,
+		detailItem: _elm_lang$core$Maybe$Nothing
 	},
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{
@@ -19777,7 +20243,7 @@ var _user$project$Main$main = _elm_lang$html$Html$program(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Json.Encode.Value":{"args":[],"tags":{"Value":[]}},"Models.CalendarView":{"args":[],"tags":{"Combined":[],"BySite":[]}},"Date.Date":{"args":[],"tags":{"Date":[]}},"Models.ChannelView":{"args":[],"tags":{"All":[],"Retail":[],"Fulfillment":[]}},"Msgs.Msg":{"args":[],"tags":{"ChangeQuery":["String"],"SearchResults":["Json.Decode.Value"],"ToggleCategory":["String"],"GetSources":[],"Sources":["Json.Decode.Value"],"SetDate":["Date.Date"],"SelectCalendarView":["Models.CalendarView"],"AdjustCalendar":["Int"],"SelectChannel":["Models.ChannelView"],"Search":[],"UserSettingsResults":["Json.Decode.Value"]}}},"aliases":{"Json.Decode.Value":{"args":[],"type":"Json.Encode.Value"}},"message":"Msgs.Msg"},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"message":"Msgs.Msg","aliases":{"Json.Decode.Value":{"type":"Json.Encode.Value","args":[]},"Models.CalendarItemChild":{"type":"{ url : String , photo : String , text : String , start : Date.Date , end : Date.Date }","args":[]},"Models.CalendarItem":{"type":"{ start : Date.Date , end : Date.Date , text : String , category : String , eventType : String , duration : Int , children : List Models.CalendarItemChild , url : String , photo : String , mediaUrl : String , allCategories : List String }","args":[]}},"unions":{"Models.ChannelView":{"tags":{"Retail":[],"Fulfillment":[],"All":[]},"args":[]},"Msgs.Msg":{"tags":{"SelectCalendarView":["Models.CalendarView"],"AdjustCalendar":["Int"],"StartHoverIntent":["String"],"SelectChannel":["Models.ChannelView"],"NavigateDetail":["Models.CalendarItem"],"Search":[],"StartHover":[],"UserSettingsResults":["Json.Decode.Value"],"SearchResults":["Json.Decode.Value"],"ChangeQuery":["String"],"ToggleCategory":["String"],"NavigateCalendar":[],"CancelHover":[],"GetSources":[],"SetDate":["Date.Date"],"Sources":["Json.Decode.Value"]},"args":[]},"Json.Encode.Value":{"tags":{"Value":[]},"args":[]},"Models.CalendarView":{"tags":{"Combined":[],"BySite":[]},"args":[]},"Date.Date":{"tags":{"Date":[]},"args":[]}}},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])

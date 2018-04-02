@@ -2,7 +2,7 @@ module Msgs exposing (Msg(..))
 
 import Date exposing (Date)
 import Json.Decode exposing (Value)
-import Models exposing (CalendarView(..), ChannelView(..), UserSettings)
+import Models exposing (CalendarItem, CalendarView(..), ChannelView(..), UserSettings)
 
 
 type Msg
@@ -17,3 +17,8 @@ type Msg
     | SelectChannel ChannelView
     | SelectCalendarView CalendarView
     | UserSettingsResults Value
+    | StartHoverIntent String
+    | StartHover
+    | CancelHover
+    | NavigateDetail CalendarItem
+    | NavigateCalendar

@@ -11,8 +11,9 @@ import Json.Decode exposing (..)
 import Json.Decode.Extra exposing ((|:), withDefault)
 
 
-type AnimState
-    = Steady
+type PageState
+    = Calendar
+    | Detail
     | Loading
 
 
@@ -27,9 +28,15 @@ type ChannelView
     | All
 
 
+type HoverIntent
+    = Intent String
+    | Hover String
+    | None
+
+
 type alias Model =
     { currentDate : Date
-    , animState : AnimState
+    , pageState : PageState
     , query : String
     , categories : List Category
     , start : Date
@@ -37,6 +44,8 @@ type alias Model =
     , items : List CalendarItem
     , selectedChannel : ChannelView
     , calendarView : CalendarView
+    , hoverIntent : HoverIntent
+    , detailItem : Maybe CalendarItem
     }
 
 
@@ -58,6 +67,9 @@ type alias CalendarItem =
 type alias CalendarItemChild =
     { url : String
     , photo : String
+    , text : String
+    , start : Date
+    , end : Date
     }
 
 
@@ -127,6 +139,22 @@ iso8601ToDate =
             )
 
 
+iso8601ToDateTime : Decoder Date.Date
+iso8601ToDateTime =
+    int
+        |> andThen
+            (\epochms ->
+                let
+                    dateAndTime =
+                        epochms |> toFloat |> Date.fromTime
+
+                    tzAdjusted =
+                        Period.add Period.Hour (getTimezoneOffset dateAndTime // 60) dateAndTime
+                in
+                succeed dateAndTime
+            )
+
+
 duration : Decoder Int
 duration =
     map2
@@ -139,9 +167,12 @@ duration =
 
 calendarItemChildDecoder : Decoder CalendarItemChild
 calendarItemChildDecoder =
-    map2 CalendarItemChild
-        (field "url" string)
-        (field "photo" string)
+    succeed CalendarItemChild
+        |: field "url" string
+        |: field "photo" string
+        |: field "title" string
+        |: field "starts" iso8601ToDateTime
+        |: field "ends" iso8601ToDateTime
 
 
 calendarItemDecoder : Decoder CalendarItem

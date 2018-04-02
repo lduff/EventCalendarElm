@@ -3,7 +3,7 @@ module Main exposing (main)
 import Date exposing (..)
 import Date.Extra.Utils exposing (unsafeFromString)
 import Html exposing (..)
-import Models exposing (AnimState(..), CalendarView(..), ChannelView(..), Model)
+import Models exposing (CalendarView(..), ChannelView(..), HoverIntent(..), Model, PageState(..))
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
 import Task
@@ -29,9 +29,11 @@ init =
       , start = unsafeFromString "1/1/2017"
       , end = unsafeFromString "1/1/2017"
       , query = ""
-      , animState = Loading
+      , pageState = Loading
       , selectedChannel = Retail
       , calendarView = BySite
+      , hoverIntent = None
+      , detailItem = Nothing
       }
     , Cmd.batch
         [ Task.perform SetDate Date.now

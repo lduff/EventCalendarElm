@@ -23,9 +23,11 @@ var _user$project$Main$init = {
 		start: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
 		end: _rluiten$elm_date_extra$Date_Extra_Utils$unsafeFromString('1/1/2017'),
 		query: '',
-		animState: _user$project$Models$Loading,
+		pageState: _user$project$Models$Loading,
 		selectedChannel: _user$project$Models$Retail,
-		calendarView: _user$project$Models$BySite
+		calendarView: _user$project$Models$BySite,
+		hoverIntent: _user$project$Models$None,
+		detailItem: _elm_lang$core$Maybe$Nothing
 	},
 	_1: _elm_lang$core$Platform_Cmd$batch(
 		{

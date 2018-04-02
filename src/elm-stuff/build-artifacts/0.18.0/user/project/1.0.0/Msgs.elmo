@@ -1,3 +1,12 @@
+var _user$project$Msgs$NavigateCalendar = {ctor: 'NavigateCalendar'};
+var _user$project$Msgs$NavigateDetail = function (a) {
+	return {ctor: 'NavigateDetail', _0: a};
+};
+var _user$project$Msgs$CancelHover = {ctor: 'CancelHover'};
+var _user$project$Msgs$StartHover = {ctor: 'StartHover'};
+var _user$project$Msgs$StartHoverIntent = function (a) {
+	return {ctor: 'StartHoverIntent', _0: a};
+};
 var _user$project$Msgs$UserSettingsResults = function (a) {
 	return {ctor: 'UserSettingsResults', _0: a};
 };

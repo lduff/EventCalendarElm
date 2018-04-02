@@ -24,8 +24,10 @@ var _user$project$Update$update = F2(
 		switch (_p1.ctor) {
 			case 'SetDate':
 				var _p2 = _p1._0;
-				var newEnd = _user$project$Models$endOfWeek(_p2);
-				var newStart = _user$project$Models$beginningOfWeek(_p2);
+				var newEnd = _user$project$Models$removeTime(
+					_user$project$Models$endOfWeek(_p2));
+				var newStart = _user$project$Models$removeTime(
+					_user$project$Models$beginningOfWeek(_p2));
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -50,7 +52,7 @@ var _user$project$Update$update = F2(
 							start: newStart,
 							end: newEnd,
 							items: {ctor: '[]'},
-							animState: _user$project$Models$Loading
+							pageState: _user$project$Models$Loading
 						}),
 					_1: _user$project$Ports$search(
 						A3(
@@ -81,7 +83,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{animState: _user$project$Models$Loading}),
+						{pageState: _user$project$Models$Loading}),
 					_1: _user$project$Ports$search(
 						A3(
 							_user$project$Models$SearchQuery,
@@ -128,7 +130,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{items: newItems, animState: _user$project$Models$Steady}),
+						{items: newItems, pageState: _user$project$Models$Calendar}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'ChangeQuery':
@@ -144,7 +146,7 @@ var _user$project$Update$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{animState: _user$project$Models$Loading}),
+						{pageState: _user$project$Models$Loading}),
 					_1: _user$project$Ports$getSources(
 						{ctor: '_Tuple0'})
 				};
@@ -189,7 +191,7 @@ var _user$project$Update$update = F2(
 					_0: newModel,
 					_1: _user$project$Update$saveSettings(newModel)
 				};
-			default:
+			case 'UserSettingsResults':
 				var userSettings = function () {
 					var _p7 = A2(_elm_lang$core$Json_Decode$decodeValue, _user$project$Models$userSettingsDecoder, _p1._0);
 					if (_p7.ctor === 'Ok') {
@@ -221,6 +223,68 @@ var _user$project$Update$update = F2(
 								},
 								model.categories)
 						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'StartHoverIntent':
+				var delayHoverCmd = A2(
+					_elm_lang$core$Task$perform,
+					function (_p8) {
+						return _user$project$Msgs$StartHover;
+					},
+					_elm_lang$core$Process$sleep(200 * _elm_lang$core$Time$millisecond));
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							hoverIntent: _user$project$Models$Intent(_p1._0)
+						}),
+					_1: delayHoverCmd
+				};
+			case 'StartHover':
+				var newHoverIntent = function () {
+					var _p9 = model.hoverIntent;
+					switch (_p9.ctor) {
+						case 'Intent':
+							return _user$project$Models$Hover(_p9._0);
+						case 'Hover':
+							return _user$project$Models$Hover(_p9._0);
+						default:
+							return _user$project$Models$None;
+					}
+				}();
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{hoverIntent: newHoverIntent}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'CancelHover':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{hoverIntent: _user$project$Models$None}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'NavigateDetail':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							pageState: _user$project$Models$Detail,
+							detailItem: _elm_lang$core$Maybe$Just(_p1._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{pageState: _user$project$Models$Calendar, detailItem: _elm_lang$core$Maybe$Nothing}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}

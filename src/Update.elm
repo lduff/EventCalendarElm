@@ -3,9 +3,12 @@ module Update exposing (update)
 import Date.Extra.Duration exposing (..)
 import Date.Extra.Format as Format
 import Json.Decode exposing (decodeValue, list)
-import Models exposing (AnimState(..), Model, beginningOfWeek, calendarItemDecoder, categoriesFromSources, endOfWeek, sourceDecoder, stringToCalendarView, stringToChannelView)
+import Models exposing (HoverIntent(..), Model, PageState(..), beginningOfWeek, calendarItemDecoder, categoriesFromSources, endOfWeek, removeTime, sourceDecoder, stringToCalendarView, stringToChannelView)
 import Msgs exposing (Msg(..))
 import Ports exposing (..)
+import Process
+import Task
+import Time
 
 
 saveSettings : Model -> Cmd Msg
@@ -26,10 +29,10 @@ update msg model =
         SetDate d ->
             let
                 newStart =
-                    beginningOfWeek d
+                    beginningOfWeek d |> removeTime
 
                 newEnd =
-                    endOfWeek d
+                    endOfWeek d |> removeTime
             in
             ( { model
                 | currentDate = d
@@ -51,7 +54,7 @@ update msg model =
                 | start = newStart
                 , end = newEnd
                 , items = []
-                , animState = Loading
+                , pageState = Loading
               }
             , search <| Models.SearchQuery model.query (Format.isoString newStart) (Format.isoString newEnd)
             )
@@ -74,7 +77,7 @@ update msg model =
             ( newModel, saveSettings model )
 
         Search ->
-            ( { model | animState = Loading }
+            ( { model | pageState = Loading }
             , search <| Models.SearchQuery model.query (Format.isoString model.start) (Format.isoString model.end)
             )
 
@@ -99,7 +102,7 @@ update msg model =
             in
             ( { model
                 | items = newItems
-                , animState = Steady
+                , pageState = Calendar
               }
             , Cmd.none
             )
@@ -108,7 +111,7 @@ update msg model =
             ( { model | query = value }, Cmd.none )
 
         GetSources ->
-            ( { model | animState = Loading }
+            ( { model | pageState = Loading }
             , getSources ()
             )
 
@@ -163,3 +166,35 @@ update msg model =
               }
             , Cmd.none
             )
+
+        StartHoverIntent id ->
+            let
+                delayHoverCmd =
+                    Process.sleep (200 * Time.millisecond)
+                        |> Task.perform (\_ -> StartHover)
+            in
+            ( { model | hoverIntent = Intent id }, delayHoverCmd )
+
+        StartHover ->
+            let
+                newHoverIntent =
+                    case model.hoverIntent of
+                        Intent id ->
+                            Hover id
+
+                        Hover id ->
+                            Hover id
+
+                        None ->
+                            None
+            in
+            ( { model | hoverIntent = newHoverIntent }, Cmd.none )
+
+        CancelHover ->
+            ( { model | hoverIntent = None }, Cmd.none )
+
+        NavigateDetail item ->
+            ( { model | pageState = Detail, detailItem = Just item }, Cmd.none )
+
+        NavigateCalendar ->
+            ( { model | pageState = Calendar, detailItem = Nothing }, Cmd.none )

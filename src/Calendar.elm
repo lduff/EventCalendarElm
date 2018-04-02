@@ -8,9 +8,9 @@ import Dict exposing (Dict)
 import Dict.Extra
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (on, onClick)
+import Html.Events exposing (on, onClick, onMouseEnter, onMouseLeave)
 import List.Extra
-import Models exposing (AnimState(..), CalendarItem, CalendarItemChild, CalendarView(..), Category, ChannelView(..), Model, removeTime)
+import Models exposing (CalendarItem, CalendarItemChild, CalendarView(..), Category, ChannelView(..), HoverIntent(..), Model, PageState(..), removeTime)
 import Msgs exposing (Msg(..))
 
 
@@ -82,13 +82,13 @@ calendarHeader model =
     div [ class "calendar-header" ]
         [ div [ class "calendar-header-prev" ]
             [ button [ class "button is-white", onClick (AdjustCalendar -7) ]
-                [ i [ class "fas fa-fast-backward" ] [] ]
+                [ i [ class "fas fa-angle-double-left" ] [] ]
             ]
         , div [ class "calendar-header-date" ]
             [ text <| "Week of " ++ format config "%B %e, %Y" model.start ]
         , div [ class "calendar-header-next" ]
             [ button [ class "button is-white", onClick (AdjustCalendar 7) ]
-                [ i [ class "fas fa-fast-forward" ] [] ]
+                [ i [ class "fas fa-angle-double-right" ] [] ]
             ]
         ]
 
@@ -205,6 +205,9 @@ calendarItem model category item =
                 "video" ->
                     "fas fa-video"
 
+                "mehrathon" ->
+                    "fas fa-meh"
+
                 _ ->
                     ""
 
@@ -236,6 +239,17 @@ calendarItem model category item =
 
                         _ ->
                             ( category.itemColor, category.backgroundColor )
+
+        isHoverItem =
+            case model.hoverIntent of
+                Hover hoverId ->
+                    category.name ++ item.url == hoverId
+
+                Intent _ ->
+                    False
+
+                None ->
+                    False
     in
     div
         [ class
@@ -250,6 +264,11 @@ calendarItem model category item =
                     else
                         ""
                    )
+                ++ (if isHoverItem then
+                        " calendar-item-hover"
+                    else
+                        ""
+                   )
             )
         , style
             [ ( "backgroundColor", itemColor )
@@ -257,6 +276,8 @@ calendarItem model category item =
             , ( "grid-column-start", toString itemStart )
             , ( "grid-column-end", toString itemEnd )
             ]
+        , onMouseEnter <| StartHoverIntent (category.name ++ item.url)
+        , onMouseLeave <| CancelHover
         ]
         [ span [ class "has-text-weight-semibold" ] [ text item.text ]
         , div [ class "calendar-item-card" ]
@@ -289,12 +310,12 @@ calendarItem model category item =
                     , class "button is-link is-small"
                     ]
                     [ text "Edit" ]
-
-                --, a
-                --    [ href "#"
-                --    , class "button is-info is-small"
-                --    ]
-                --    [ text "Report" ]
+                , a
+                    [ href "#"
+                    , class "button is-small"
+                    , onClick <| NavigateDetail item
+                    ]
+                    [ text "Details" ]
                 ]
             ]
         , i

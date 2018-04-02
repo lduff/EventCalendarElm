@@ -113,6 +113,19 @@ var _user$project$Models$calendarViewToString = function (calendarView) {
 		return 'combined';
 	}
 };
+var _user$project$Models$iso8601ToDateTime = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	function (epochms) {
+		var dateAndTime = _elm_lang$core$Date$fromTime(
+			_elm_lang$core$Basics$toFloat(epochms));
+		var tzAdjusted = A3(
+			_rluiten$elm_date_extra$Date_Extra_Period$add,
+			_rluiten$elm_date_extra$Date_Extra_Period$Hour,
+			(_rluiten$elm_date_extra$Date_Extra_Create$getTimezoneOffset(dateAndTime) / 60) | 0,
+			dateAndTime);
+		return _elm_lang$core$Json_Decode$succeed(dateAndTime);
+	},
+	_elm_lang$core$Json_Decode$int);
 var _user$project$Models$beginningOfWeek = function (date) {
 	return A3(
 		_rluiten$elm_date_extra$Date_Extra_Duration$add,
@@ -164,10 +177,29 @@ var _user$project$Models$duration = A3(
 		}),
 	A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDate),
 	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDate));
-var _user$project$Models$Model = F9(
-	function (a, b, c, d, e, f, g, h, i) {
-		return {currentDate: a, animState: b, query: c, categories: d, start: e, end: f, items: g, selectedChannel: h, calendarView: i};
-	});
+var _user$project$Models$Model = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {currentDate: a, pageState: b, query: c, categories: d, start: e, end: f, items: g, selectedChannel: h, calendarView: i, hoverIntent: j, detailItem: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
 var _user$project$Models$CalendarItem = function (a) {
 	return function (b) {
 		return function (c) {
@@ -191,15 +223,26 @@ var _user$project$Models$CalendarItem = function (a) {
 		};
 	};
 };
-var _user$project$Models$CalendarItemChild = F2(
-	function (a, b) {
-		return {url: a, photo: b};
+var _user$project$Models$CalendarItemChild = F5(
+	function (a, b, c, d, e) {
+		return {url: a, photo: b, text: c, start: d, end: e};
 	});
-var _user$project$Models$calendarItemChildDecoder = A3(
-	_elm_lang$core$Json_Decode$map2,
-	_user$project$Models$CalendarItemChild,
-	A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string),
-	A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string));
+var _user$project$Models$calendarItemChildDecoder = A2(
+	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+	A2(
+		_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+		A2(
+			_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+			A2(
+				_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+				A2(
+					_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
+					_elm_lang$core$Json_Decode$succeed(_user$project$Models$CalendarItemChild),
+					A2(_elm_lang$core$Json_Decode$field, 'url', _elm_lang$core$Json_Decode$string)),
+				A2(_elm_lang$core$Json_Decode$field, 'photo', _elm_lang$core$Json_Decode$string)),
+			A2(_elm_lang$core$Json_Decode$field, 'title', _elm_lang$core$Json_Decode$string)),
+		A2(_elm_lang$core$Json_Decode$field, 'starts', _user$project$Models$iso8601ToDateTime)),
+	A2(_elm_lang$core$Json_Decode$field, 'ends', _user$project$Models$iso8601ToDateTime));
 var _user$project$Models$calendarItemDecoder = A2(
 	_elm_community$json_extra$Json_Decode_Extra_ops['|:'],
 	A2(
@@ -268,7 +311,8 @@ var _user$project$Models$UserSettings = F3(
 		return {filteredCategories: a, selectedChannel: b, selectedView: c};
 	});
 var _user$project$Models$Loading = {ctor: 'Loading'};
-var _user$project$Models$Steady = {ctor: 'Steady'};
+var _user$project$Models$Detail = {ctor: 'Detail'};
+var _user$project$Models$Calendar = {ctor: 'Calendar'};
 var _user$project$Models$Combined = {ctor: 'Combined'};
 var _user$project$Models$BySite = {ctor: 'BySite'};
 var _user$project$Models$stringToCalendarView = function (s) {
@@ -334,4 +378,11 @@ var _user$project$Models$stringToChannelView = function (s) {
 		default:
 			return _user$project$Models$Retail;
 	}
+};
+var _user$project$Models$None = {ctor: 'None'};
+var _user$project$Models$Hover = function (a) {
+	return {ctor: 'Hover', _0: a};
+};
+var _user$project$Models$Intent = function (a) {
+	return {ctor: 'Intent', _0: a};
 };
