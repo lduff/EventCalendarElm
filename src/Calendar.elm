@@ -310,12 +310,15 @@ calendarItem model category item =
                     , class "button is-link is-small"
                     ]
                     [ text "Edit" ]
-                , a
-                    [ href "#"
-                    , class "button is-small"
-                    , onClick <| NavigateDetail item
-                    ]
-                    [ text "Details" ]
+                , if item.eventType == "mehrathon" then
+                    a
+                        [ href "#"
+                        , class "button is-small"
+                        , onClick <| NavigateDetail item
+                        ]
+                        [ text "Details" ]
+                  else
+                    text ""
                 ]
             ]
         , i

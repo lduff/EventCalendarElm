@@ -329,7 +329,7 @@ var _user$project$Calendar$calendarItem = F3(
 														}),
 													_1: {
 														ctor: '::',
-														_0: A2(
+														_0: _elm_lang$core$Native_Utils.eq(item.eventType, 'mehrathon') ? A2(
 															_elm_lang$html$Html$a,
 															{
 																ctor: '::',
@@ -349,7 +349,7 @@ var _user$project$Calendar$calendarItem = F3(
 																ctor: '::',
 																_0: _elm_lang$html$Html$text('Details'),
 																_1: {ctor: '[]'}
-															}),
+															}) : _elm_lang$html$Html$text(''),
 														_1: {ctor: '[]'}
 													}
 												}
